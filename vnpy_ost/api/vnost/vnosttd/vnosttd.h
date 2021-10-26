@@ -531,7 +531,7 @@ public:
 	//req:主动函数的请求字典
 	//-------------------------------------------------------------------------------------
 
-	void CreateApi(string pszFlowPath = "", int nCPUID = 0);
+	void createApi(string pszFlowPath = "", int nCPUID = 0);
 
 	void release();
 
@@ -549,7 +549,7 @@ public:
 
 	void subscribePublicTopic(int nResumeType);
 
-	void subscribePrivateTopic(const dict &req);
+	void submitTerminalInfo(const dict &req);
 
 	int reqOrderInsert(const dict &req, int reqid);
 
