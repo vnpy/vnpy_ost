@@ -79,6 +79,24 @@ void getInt(const dict &d, const char *key, int *value)
     }
 };
 
+void getShort(const dict &d, const char *key, short *value)
+{
+	if (d.contains(key))		//检查字典中是否存在该键值
+	{
+		object o = d[key];		//获取该键值
+		*value = o.cast<short>();
+	}
+};
+
+void getLonglong(const dict &d, const char *key, long long *value)
+{
+	if (d.contains(key))		//检查字典中是否存在该键值
+	{
+		object o = d[key];		//获取该键值
+		*value = o.cast<long long>();
+	}
+};
+
 
 //从字典中获取某个建值对应的浮点数，并赋值到请求结构体对象的值上
 void getDouble(const dict &d, const char *key, double *value)
