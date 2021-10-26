@@ -45,14 +45,14 @@ class ApiGenerator:
         self.generate_header_on()
         self.generate_header_function()
 
-#        self.generate_source_task()
-#        self.generate_source_switch()
-#        self.generate_source_process()
-#        self.generate_source_function()
-#        self.generate_source_on()
-#        self.generate_source_module()
+        self.generate_source_task()
+        self.generate_source_switch()
+        self.generate_source_process()
+        self.generate_source_function()
+        self.generate_source_on()
+        self.generate_source_module()
 
-        print("API生成成功")
+        print(f"{self.name}API生成成功")
 
     def process_line(self, line: str):
         """处理每行"""
@@ -164,6 +164,11 @@ class ApiGenerator:
                         f.write(f"\ttask.task_id = {field};\n")
                     elif type_ == "bool":
                         f.write(f"\ttask.task_last = {field};\n")
+                    elif type_ == "const":
+                        type__ = field.rsplit("&")[0]
+                        f.write(f"\t{type__} *task_data = new {type__}();\n")
+                        f.write(f"\t*task_data = reply;\n")
+                        f.write(f"\ttask.task_data = task_data;\n")
                     elif type_ == "CUTRspInfoField":
                         f.write(f"\tif ({field})\n")
                         f.write("\t{\n")
@@ -210,11 +215,28 @@ class ApiGenerator:
                 args = []
 
                 for field, type_ in d.items():
-                    print(field, type_)
                     if type_ == "int":
                         args.append("task->task_id")
                     elif type_ == "bool":
                         args.append("task->task_last")
+                    elif type_ == "const":
+                        type__ = field.rsplit("&")[0]
+                        args.append("data")
+
+                        f.write("\tdict data;\n")
+                        f.write(
+                            f"\t{type__} *task_data = ({type__}*)task.task_data;\n")
+
+                        struct_fields = self.structs[type__]
+                        for struct_field, struct_type in struct_fields.items():
+                            if struct_type == "string":
+                                f.write(
+                                    f"\tdata[\"{struct_field}\"] = toUtf(task_data.{struct_field});\n")
+                            else:
+                                f.write(
+                                    f"\tdata[\"{struct_field}\"] = task_data.{struct_field};\n")
+
+                        f.write("\tdelete task_data;\n")
                     elif type_ == "CUTRspInfoField":
                         args.append("error")
 
@@ -279,6 +301,7 @@ class ApiGenerator:
                     if struct_type == "string":
                         line = f"\tgetString(req, \"{struct_field}\", myreq.{struct_field});\n"
                     else:
+                        print(struct_type)
                         line = f"\tget{struct_type.capitalize()}(req, \"{struct_field}\", &myreq.{struct_field});\n"
                     f.write(line)
 
@@ -302,6 +325,9 @@ class ApiGenerator:
                     elif type_ == "bool":
                         args.append("bool last")
                         bind_args.append("last")
+                    elif type_ == "const":
+                        args.append("const dict &data")
+                        bind_args.append("data")
                     elif type_ == "CUTRspInfoField":
                         args.append("const dict &error")
                         bind_args.append("error")
