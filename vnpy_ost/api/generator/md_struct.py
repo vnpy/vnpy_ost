@@ -5,8 +5,8 @@ CSecurityDntSubscribeReq = {
 }
 
 CSecurityDntRspInfoField = {
-    "TRetValueType": "int32_t",
-    "TErrMessageType": "string",
+    "ErrorID": "int32_t",
+    "ErrorMsg": "string",
 }
 
 EntryInfo = {
@@ -70,16 +70,16 @@ CSecurityDntL2OrderField = {
 }
 
 CSecurityDntL2IndexField = {
-    "TLocalTimeStampType": "int64_t",
-    "TSecuritySourceType": "uint16_t",
-    "TSecurityIdType": "string",
-    "TPriceType": "int64_t",
-    "TPriceType": "int64_t",
-    "TPriceType": "int64_t",
-    "TPriceType": "int64_t",
-    "TPriceType": "int64_t",
-    "TPriceType": "int64_t",
-    "TPriceType": "int64_t",
-    "TOrderQty": "int64_t",
+    "timeStamp": "int64_t",
+    "marketId": "uint16_t",
+    "SecurityID": "string",
+    "preCloseIndex": "int64_t",
+    "openIndex": "int64_t",
+    "closeIndex": "int64_t",
+    "highIndex": "int64_t",
+    "lowIndex": "int64_t",
+    "lastIndex": "int64_t",
+    "turnOver": "int64_t",
+    "totalVolume": "int64_t",
 }
 

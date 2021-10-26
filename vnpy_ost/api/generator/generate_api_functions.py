@@ -225,16 +225,16 @@ class ApiGenerator:
 
                         f.write("\tdict data;\n")
                         f.write(
-                            f"\t{type__} *task_data = ({type__}*)task.task_data;\n")
+                            f"\t{type__} *task_data = ({type__}*)task->task_data;\n")
 
                         struct_fields = self.structs[type__]
                         for struct_field, struct_type in struct_fields.items():
                             if struct_type == "string":
                                 f.write(
-                                    f"\tdata[\"{struct_field}\"] = toUtf(task_data.{struct_field});\n")
+                                    f"\tdata[\"{struct_field}\"] = toUtf(task_data->{struct_field});\n")
                             else:
                                 f.write(
-                                    f"\tdata[\"{struct_field}\"] = task_data.{struct_field};\n")
+                                    f"\tdata[\"{struct_field}\"] = task_data->{struct_field};\n")
 
                         f.write("\tdelete task_data;\n")
                     elif type_ == "CUTRspInfoField":
@@ -301,7 +301,8 @@ class ApiGenerator:
                     if struct_type == "string":
                         line = f"\tgetString(req, \"{struct_field}\", myreq.{struct_field});\n"
                     else:
-                        print(struct_type)
+                        if struct_type == "long long":
+                            struct_type = "longlong"
                         line = f"\tget{struct_type.capitalize()}(req, \"{struct_field}\", &myreq.{struct_field});\n"
                     f.write(line)
 

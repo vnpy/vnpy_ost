@@ -8,8 +8,8 @@ TYPE_CPP2PY = {
     "int32_t": "int32_t",
     "int64_t": "int64_t",
     "double": "double",
-    "short": "int",
-    "long": "int"
+    "short": "short",
+    "long": "long long"
 }
 
 

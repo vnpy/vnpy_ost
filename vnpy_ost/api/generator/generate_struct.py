@@ -71,13 +71,13 @@ class StructGenerator:
 
     def process_member(self, line: str):
         """处理成员"""
-        line = line.split(";")[0]
-        words_ = line.split("\t")
-        words = words_[1].split(" ")
-        words = [word for word in words if word != " "]
+        line_ = line.rsplit(";")[0]
+        words_ = line_.replace(" ", "\t")
+        words = words_.split("\t")
+        words = [word for word in words if word != "\t"]
 
-        py_type = self.typedefs.get(words[0], "enum")
-        if words[0] == "EntryInfoList":
+        py_type = self.typedefs.get(words[1], "enum")
+        if words[1] == "EntryInfoList":
             py_type = "dict"
         name = words[-1]
         if "[" in name:
