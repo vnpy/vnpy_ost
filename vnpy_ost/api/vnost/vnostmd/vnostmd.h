@@ -35,6 +35,7 @@ using namespace pybind11;
 ///-------------------------------------------------------------------------------------
 
 //APIµÄ¼Ì³ÐÊµÏÖ
+using namespace _DNT_;
 class MdApi : public CSecurityDntL2MDUserSpi
 {
 private:
@@ -201,34 +202,30 @@ public:
 
 	void release();
 
-	void init();
-
-	int join();
-
 	int exit();
 
 	void registerFront(string kConnectorAddress, string kDomainServer, string kContextName);
 
 	string getTradingDay();
 
-	int SubscribeFutureMarketData(const dict &req, bool bAll);
+	int subscribeFutureMarketData(const dict &req, bool bAll);
 
-	int UnSubscribeFutureMarketData(const dict &req, bool bAll);
+	int unSubscribeFutureMarketData(const dict &req, bool bAll);
 
-	int SubscribeL1MarketData(const dict &req, bool bAll);
+	int subscribeL1MarketData(const dict &req, bool bAll);
 
-	int UnSubscribeL1MarketData(const dict &req, bool bAll);
+	int unSubscribeL1MarketData(const dict &req, bool bAll);
 
-	int SubscribeL2MarketData(const dict &req, bool bAll);
+	int subscribeL2MarketData(const dict &req, bool bAll);
 
-	int UnSubscribeL2MarketData(const dict &req, bool bAll);
+	int unSubscribeL2MarketData(const dict &req, bool bAll);
 
-	int SubscribeL2OrderAndTrade();
+	int subscribeL2OrderAndTrade();
 
-	int UnSubscribeL2OrderAndTrade();
+	int unSubscribeL2OrderAndTrade();
 
-	int SubscribeL2IndexMarketData();
+	int subscribeL2IndexMarketData();
 
-	int UnSubscribeL2IndexMarketData();
+	int unSubscribeL2IndexMarketData();
 
 };

@@ -128,6 +128,14 @@ void getInt32(const dict &d, const char *key, INT32 *value)
 	}
 };
 
+void getUint16(const dict &d, const char *key, UINT16 *value)
+{
+	if (d.contains(key))		//检查字典中是否存在该键值
+	{
+		object o = d[key];		//获取该键值
+		*value = o.cast<UINT16>();
+	}
+};
 
 void getUint32(const dict &d, const char *key, UINT32 *value)
 {
