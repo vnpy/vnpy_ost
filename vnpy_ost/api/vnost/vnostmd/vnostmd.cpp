@@ -619,6 +619,354 @@ int MdApi::subscribeFutureMarketData(const dict& req, const bool bAll = false)
 	CSecurityDntSubscribeReq myreq = CSecurityDntSubscribeReq();
 	memset(&myreq, 0, sizeof(myreq));
 	getUint16(req, "securitySource", &myreq.securitySource);
+	getString(req, "securityId", myreq.securityId);
+	int eSubscribeType;
+	getInt(req, "subscribeType", &eSubscribeType);
+	myreq.subscribeType = (ESubscribeType)eSubscribeType;
 	int i = this->api->SubscribeFutureMarketData(myreq, bAll);
 	return i;
 };
+
+int MdApi::unSubscribeFutureMarketData(const dict& req, const bool bAll = false)
+{
+	CSecurityDntSubscribeReq myreq = CSecurityDntSubscribeReq();
+	memset(&myreq, 0, sizeof(myreq));
+	getUint16(req, "securitySource", &myreq.securitySource);
+	getString(req, "securityId", myreq.securityId);
+	int eSubscribeType;
+	getInt(req, "subscribeType", &eSubscribeType);
+	myreq.subscribeType = (ESubscribeType)eSubscribeType;
+	int i = this->api->UnSubscribeFutureMarketData(myreq, bAll);
+	return i;
+};
+
+int MdApi::subscribeL1MarketData(const dict& req, const bool bAll = false)
+{
+	CSecurityDntSubscribeReq myreq = CSecurityDntSubscribeReq();
+	memset(&myreq, 0, sizeof(myreq));
+	getUint16(req, "securitySource", &myreq.securitySource);
+	getString(req, "securityId", myreq.securityId);
+	int eSubscribeType;
+	getInt(req, "subscribeType", &eSubscribeType);
+	myreq.subscribeType = (ESubscribeType)eSubscribeType;
+	int i = this->api->SubscribeL1MarketData(myreq, bAll);
+	return i;
+};
+
+int MdApi::unSubscribeL1MarketData(const dict& req, const bool bAll = false)
+{
+	CSecurityDntSubscribeReq myreq = CSecurityDntSubscribeReq();
+	memset(&myreq, 0, sizeof(myreq));
+	getUint16(req, "securitySource", &myreq.securitySource);
+	getString(req, "securityId", myreq.securityId);
+	int eSubscribeType;
+	getInt(req, "subscribeType", &eSubscribeType);
+	myreq.subscribeType = (ESubscribeType)eSubscribeType;
+	int i = this->api->UnSubscribeL1MarketData(myreq, bAll);
+	return i;
+};
+
+int MdApi::subscribeL2MarketData(const dict& req, const bool bAll = false)
+{
+	CSecurityDntSubscribeReq myreq = CSecurityDntSubscribeReq();
+	memset(&myreq, 0, sizeof(myreq));
+	getUint16(req, "securitySource", &myreq.securitySource);
+	getString(req, "securityId", myreq.securityId);
+	int eSubscribeType;
+	getInt(req, "subscribeType", &eSubscribeType);
+	myreq.subscribeType = (ESubscribeType)eSubscribeType;
+	int i = this->api->SubscribeL2MarketData(myreq, bAll);
+	return i;
+};
+
+int MdApi::unSubscribeL2MarketData(const dict& req, const bool bAll = false)
+{
+	CSecurityDntSubscribeReq myreq = CSecurityDntSubscribeReq();
+	memset(&myreq, 0, sizeof(myreq));
+	getUint16(req, "securitySource", &myreq.securitySource);
+	getString(req, "securityId", myreq.securityId);
+	int eSubscribeType;
+	getInt(req, "subscribeType", &eSubscribeType);
+	myreq.subscribeType = (ESubscribeType)eSubscribeType;
+	int i = this->api->UnSubscribeL2MarketData(myreq, bAll);
+	return i;
+};
+
+int MdApi::subscribeL2OrderAndTrade()
+{
+	int i = this->api->SubscribeL2OrderAndTrade();
+	return i;
+};
+
+int MdApi::unSubscribeL2OrderAndTrade()
+{
+	int i = this->api->UnSubscribeL2OrderAndTrade();
+	return i;
+};
+
+int MdApi::subscribeL2IndexMarketData()
+{
+	int i = this->api->SubscribeL2IndexMarketData();
+	return i;
+};
+
+int MdApi::unSubscribeL2IndexMarketData()
+{
+	int i = this->api->UnSubscribeL2IndexMarketData();
+	return i;
+};
+
+
+///-------------------------------------------------------------------------------------
+///Boost.Python·â×°
+///-------------------------------------------------------------------------------------
+
+class PyMdApi : public MdApi
+{
+public:
+	using MdApi::MdApi;
+	void onFrontConnected(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onFrontConnected, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRspSubFutureMarketData(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRspSubFutureMarketData, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRspUnSubFutureMarketData(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRspUnSubFutureMarketData, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRspSubL2MarketData(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRspSubL2MarketData, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRspUnSubL2MarketData(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRspUnSubL2MarketData, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRspSubL1MarketData(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRspSubL1MarketData, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRspUnSubL1MarketData(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRspUnSubL1MarketData, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRspSubL2OrderAndTrade(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRspSubL2OrderAndTrade, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRspUnSubL2OrderAndTrade(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRspUnSubL2OrderAndTrade, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRspSubL2IndexMarketData(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRspSubL2IndexMarketData, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRspUnSubL2IndexMarketData(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRspUnSubL2IndexMarketData, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRtnL1MarketData(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRtnL1MarketData, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRtnFutureMarketData(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRtnFutureMarketData, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRtnL2MarketData(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRtnL2MarketData, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRtnL2IndexMarketData(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRtnL2IndexMarketData, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRtnL2Order(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRtnL2Order, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onRtnL2Trade(const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onRtnL2Trade, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+};
+
+PYBIND11_MODULE(vnostmd, m)
+{
+	class_<MdApi, PyMdApi> mdapi(m, "MdApi", module_local());
+	mdapi
+		.def(init<>())
+		.def("createCSecurityDntL2MDUserApi", &MdApi::createCSecurityDntL2MDUserApi)
+		.def("release", &MdApi::release)
+		.def("exit", &MdApi::exit)
+		.def("registerFront", &MdApi::registerFront)
+		.def("getTradingDay", &MdApi::getTradingDay)
+		.def("subscribeFutureMarketData", &MdApi::subscribeFutureMarketData)
+		.def("unSubscribeFutureMarketData", &MdApi::unSubscribeFutureMarketData)
+		.def("subscribeL1MarketData", &MdApi::subscribeL1MarketData)
+		.def("unSubscribeL1MarketData", &MdApi::unSubscribeL1MarketData)
+		.def("subscribeL2MarketData", &MdApi::subscribeL2MarketData)
+		.def("unSubscribeL2MarketData", &MdApi::unSubscribeL2MarketData)
+		.def("subscribeL2OrderAndTrade", &MdApi::subscribeL2OrderAndTrade)
+		.def("unSubscribeL2OrderAndTrade", &MdApi::unSubscribeL2OrderAndTrade)
+		.def("subscribeL2IndexMarketData", &MdApi::subscribeL2IndexMarketData)
+		.def("unSubscribeL2IndexMarketData", &MdApi::unSubscribeL2IndexMarketData)
+
+		.def("onFrontConnected", &MdApi::onFrontConnected)
+		.def("onRspSubFutureMarketData", &MdApi::onRspSubFutureMarketData)
+		.def("onRspUnSubFutureMarketData", &MdApi::onRspUnSubFutureMarketData)
+		.def("onRspSubL2MarketData", &MdApi::onRspSubL2MarketData)
+		.def("onRspUnSubL2MarketData", &MdApi::onRspUnSubL2MarketData)
+		.def("onRspSubL1MarketData", &MdApi::onRspSubL1MarketData)
+		.def("onRspUnSubL1MarketData", &MdApi::onRspUnSubL1MarketData)
+		.def("onRspSubL2OrderAndTrade", &MdApi::onRspSubL2OrderAndTrade)
+		.def("onRspUnSubL2OrderAndTrade", &MdApi::onRspUnSubL2OrderAndTrade)
+		.def("onRspSubL2IndexMarketData", &MdApi::onRspSubL2IndexMarketData)
+		.def("onRspUnSubL2IndexMarketData", &MdApi::onRspUnSubL2IndexMarketData)
+		.def("onRtnL1MarketData", &MdApi::onRtnL1MarketData)
+		.def("onRtnFutureMarketData", &MdApi::onRtnFutureMarketData)
+		.def("onRtnL2MarketData", &MdApi::onRtnL2MarketData)
+		.def("onRtnL2IndexMarketData", &MdApi::onRtnL2IndexMarketData)
+		.def("onRtnL2Order", &MdApi::onRtnL2Order)
+		.def("onRtnL2Trade", &MdApi::onRtnL2Trade)
+		;
+}
