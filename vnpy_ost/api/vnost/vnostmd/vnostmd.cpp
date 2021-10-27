@@ -446,9 +446,26 @@ void MdApi::processRtnL1MarketData(Task *task)
 	data["tradeVolumn"] = task_data->tradeVolumn;
 	data["tradeValue"] = task_data->tradeValue;
 	data["buyLength"] = task_data->buyLength;
-	data["buyEntry"] = task_data->buyEntry;
 	data["sellLength"] = task_data->sellLength;
-	data["sellEntry"] = task_data->sellEntry;
+
+	pybind11::list ask;
+	pybind11::list ask_qty;
+	pybind11::list bid;
+	pybind11::list bid_qty;
+
+	for (int i = 0; i < 10; i++)
+	{
+		ask.append(task_data->sellEntry[i].price);
+		ask_qty.append(task_data->sellEntry[i].OrderQty);
+		bid.append(task_data->buyEntry[i].price);
+		bid_qty.append(task_data->buyEntry[i].OrderQty);
+	}
+
+	data["ask"] = ask;
+	data["bid"] = bid;
+	data["bid_qty"] = bid_qty;
+	data["ask_qty"] = ask_qty;
+
 	delete task_data;
 	this->onRtnL1MarketData(data);
 };
@@ -477,9 +494,26 @@ void MdApi::processRtnFutureMarketData(Task *task)
 	data["tradeVolumn"] = task_data->tradeVolumn;
 	data["tradeValue"] = task_data->tradeValue;
 	data["buyLength"] = task_data->buyLength;
-	data["buyEntry"] = task_data->buyEntry;
 	data["sellLength"] = task_data->sellLength;
-	data["sellEntry"] = task_data->sellEntry;
+
+	pybind11::list ask;
+	pybind11::list ask_qty;
+	pybind11::list bid;
+	pybind11::list bid_qty;
+
+	for (int i = 0; i < 10; i++)
+	{
+		ask.append(task_data->sellEntry[i].price);
+		ask_qty.append(task_data->sellEntry[i].OrderQty);
+		bid.append(task_data->buyEntry[i].price);
+		bid_qty.append(task_data->buyEntry[i].OrderQty);
+	}
+
+	data["ask"] = ask;
+	data["bid"] = bid;
+	data["bid_qty"] = bid_qty;
+	data["ask_qty"] = ask_qty;
+
 	delete task_data;
 	this->onRtnFutureMarketData(data);
 };
@@ -508,9 +542,26 @@ void MdApi::processRtnL2MarketData(Task *task)
 	data["tradeVolumn"] = task_data->tradeVolumn;
 	data["tradeValue"] = task_data->tradeValue;
 	data["buyLength"] = task_data->buyLength;
-	data["buyEntry"] = task_data->buyEntry;
 	data["sellLength"] = task_data->sellLength;
-	data["sellEntry"] = task_data->sellEntry;
+
+	pybind11::list ask;
+	pybind11::list ask_qty;
+	pybind11::list bid;
+	pybind11::list bid_qty;
+
+	for (int i = 0; i < 10; i++)
+	{
+		ask.append(task_data->sellEntry[i].price);
+		ask_qty.append(task_data->sellEntry[i].OrderQty);
+		bid.append(task_data->buyEntry[i].price);
+		bid_qty.append(task_data->buyEntry[i].OrderQty);
+	}
+
+	data["ask"] = ask;
+	data["bid"] = bid;
+	data["bid_qty"] = bid_qty;
+	data["ask_qty"] = ask_qty;
+
 	delete task_data;
 	this->onRtnL2MarketData(data);
 };
