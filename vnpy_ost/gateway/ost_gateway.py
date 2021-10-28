@@ -1,6 +1,9 @@
+from logging import error
+from re import T
 import pytz
 from datetime import datetime
-from typing import Any, Dict, List, Set, Tuple
+from time import sleep
+from typing import Dict, List, Tuple
 from pathlib import Path
 
 from vnpy.event import EventEngine
@@ -29,32 +32,44 @@ from vnpy.trader.event import EVENT_TIMER
 from ..api import MdApi, TdApi
 
 # 委托状态映射
-STATUS_OST2VT: Dict[Any, Status] = {
-    0: Status.ALLTRADED,
-    1: Status.PARTTRADED,
-    2: Status.PARTTRADED,
-    3: Status.NOTTRADED,
-    4: Status.NOTTRADED,
-    5: Status.CANCELLED,
-    "a": Status.REJECTED
+STATUS_OST2VT: Dict[str, Status] = {
+    '0': Status.ALLTRADED,
+    '1': Status.PARTTRADED,
+    '2': Status.CANCELLED,
+    '3': Status.NOTTRADED,
+    '4': Status.CANCELLED,
+    '5': Status.CANCELLED,
+    "a": Status.SUBMITTING
 }
 
 # 买卖方向映射
-DIRECTION_VT2OST: Dict[Direction, int] = {
-    Direction.LONG: 0,
-    Direction.SHORT: 1
+DIRECTION_VT2OST: Dict[Direction, str] = {
+    Direction.LONG: '0',
+    Direction.SHORT: '1'
 }
-DIRECTION_OST2VT: Dict[int, Direction] = {v: k for k, v in DIRECTION_VT2OST.items()}
+DIRECTION_OST2VT: Dict[str, Direction] = {v: k for k, v in DIRECTION_VT2OST.items()}
+
+# 委托类型映射
+ORDERTYPE_VT2OST: Dict[OrderType, Tuple] = {
+    OrderType.LIMIT: ('2', '3', '1'),
+    OrderType.MARKET: ('H', '3', '1')
+}
+ORDERTYPE_OST2VT: Dict[Tuple, OrderType] = {v: k for k, v in ORDERTYPE_VT2OST.items()}
 
 # 交易所映射
-EXCHANGE_OST2VT: Dict[int, Exchange] = {
-    1: Exchange.SSE,
-    2: Exchange.SZSE
+EXCHANGE_OST2VT: Dict[str, Exchange] = {
+    '1': Exchange.SSE,
+    '2': Exchange.SZSE
+}
+EXCHANGE_VT2OST: Dict[Exchange, str] = {v: k for k, v in EXCHANGE_OST2VT.items()}
+EXCHANGE_VT2OSTMD: Dict[Exchange, int] = {
+    Exchange.SSE: 101,
+    Exchange.SZSE: 102
 }
 
 # 产品类型映射
-PRODUCT_OST2VT: Dict[int, Product] = {
-    8: Product.EQUITY
+PRODUCT_OST2VT: Dict[str, Product] = {
+    '8': Product.EQUITY
 }
 
 # 中国时区
@@ -62,6 +77,7 @@ CHINA_TZ = pytz.timezone("Asia/Shanghai")
 
 # 合约数据全局缓存字典
 symbol_contract_map: Dict[str, ContractData] = {}
+
 
 class OstGateway(BaseGateway):
     """
@@ -71,10 +87,7 @@ class OstGateway(BaseGateway):
     default_setting: Dict[str, str] = {
         "用户名": "",
         "密码": "",
-        "经纪商代码": "",
-        "交易服务器": "",
-        "产品名称": "",
-        "授权编码": ""
+        "交易服务器": ""
     }
 
     exchanges: List[str] = list(EXCHANGE_OST2VT.values())
@@ -90,10 +103,7 @@ class OstGateway(BaseGateway):
         """连接交易接口"""
         userid: str = setting["用户名"]
         password: str = setting["密码"]
-        brokerid: str = setting["经纪商代码"]
         td_address: str = setting["交易服务器"]
-        appid: str = setting["产品名称"]
-        auth_code: str = setting["授权编码"]
 
         if (
             (not td_address.startswith("tcp://"))
@@ -101,7 +111,7 @@ class OstGateway(BaseGateway):
         ):
             td_address = "tcp://" + td_address
 
-        self.td_api.connect(td_address, userid, password, brokerid, auth_code, appid)
+        self.td_api.connect(td_address, userid, password)
         self.td_api.connect()
 
         self.init_query()
@@ -150,8 +160,6 @@ class OstGateway(BaseGateway):
         func()
         self.query_functions.append(func)
 
-        self.md_api.update_date()
-
     def init_query(self) -> None:
         """初始化查询任务"""
         self.count: int = 0
@@ -170,10 +178,7 @@ class OstMdApi(MdApi):
         self.gateway_name: str = gateway.gateway_name
 
         self.reqid: int = 0
-
         self.connect_status: bool = False
-
-        self.current_date: str = datetime.now().strftime("%Y%m%d")
 
     def onRspSubL1MarketData(self, data: dict,) -> None:
         """订阅行情回报"""
@@ -193,10 +198,13 @@ class OstMdApi(MdApi):
         if not contract:
             return
 
+        dt: datetime = datetime.strptime(data["origTime"], "%Y%m%d%H:%M:%S")
+        dt: datetime = CHINA_TZ.localize(dt)
+
         tick: TickData = TickData(
             symbol=symbol,
             exchange=contract.exchange,
-            datetime=generate_datetime(data["origTime"]),
+            datetime=dt,
             name=contract.name,
             volume=data["tradeVolumn"],
             turnover=data["tradeValue"],
@@ -228,8 +236,13 @@ class OstMdApi(MdApi):
     def subscribe(self, req: SubscribeRequest) -> None:
         """订阅行情"""
         if self.connect_status:
+            exchange: int = EXCHANGE_VT2OSTMD.get(req.exchange, None)
+            if not exchange:
+                self.gateway.write_log(f"不支持的交易所{req.exchange.value}")
+                return
+
             ost_req: dict = {
-               "securitySource": 101,
+               "securitySource": exchange,
                "securityId": req.symbol,
                "subscribeType": 1
             }
@@ -239,10 +252,6 @@ class OstMdApi(MdApi):
         """关闭连接"""
         if self.connect_status:
             self.exit()
-
-    def update_date(self) -> None:
-        """更新当前日期"""
-        self.current_date = datetime.now().strftime("%Y%m%d")
 
 
 class OstTdApi(TdApi):
@@ -260,48 +269,30 @@ class OstTdApi(TdApi):
 
         self.connect_status: bool = False
         self.login_status: bool = False
-        self.auth_status: bool = False
         self.login_failed: bool = False
         self.contract_inited: bool = False
 
         self.userid: str = ""
         self.password: str = ""
-        self.brokerid: str = ""
-        self.auth_code: str = ""
-        self.appid: str = ""
 
         self.frontid: int = 0
         self.sessionid: int = 0
 
         self.order_data: List[dict] = []
         self.trade_data: List[dict] = []
-        self.positions: Dict[str, PositionData] = {}
         self.sysid_orderid_map: Dict[str, str] = {}
 
     def onFrontConnected(self) -> None:
         """服务器连接成功回报"""
         self.gateway.write_log("交易服务器连接成功")
-
-        if self.auth_code:
-            self.authenticate()
-        else:
-            self.login()
+        self.login()
 
     def onFrontDisconnected(self, reason: int) -> None:
         """服务器连接断开回报"""
         self.login_status = False
         self.gateway.write_log(f"交易服务器连接断开，原因{reason}")
 
-    def onRspAuthenticate(self, data: dict, error: dict, reqid: int, last: bool) -> None:
-        """用户授权验证回报"""
-        if not error['ErrorID']:
-            self.auth_status = True
-            self.gateway.write_log("交易服务器授权验证成功")
-            self.login()
-        else:
-            self.gateway.write_error("交易服务器授权验证失败", error)
-
-    def onRspUserLogin(self, data: dict, error: dict, reqid: int, last: bool) -> None:
+    def onRspLogin(self, data: dict, error: dict, reqid: int, last: bool) -> None:
         """用户登录请求回报"""
         if not error["ErrorID"]:
             self.frontid = data["FrontID"]
@@ -309,13 +300,9 @@ class OstTdApi(TdApi):
             self.login_status = True
             self.gateway.write_log("交易服务器登录成功")
 
-            # 自动确认结算单
-            ost_req: dict = {
-                "BrokerID": self.brokerid,
-                "InvestorID": self.userid
-            }
             self.reqid += 1
-            self.reqSettlementInfoConfirm(ost_req, self.reqid)
+            self.reqQryInstrument({}, self.reqid)
+
         else:
             self.login_failed = True
 
@@ -347,76 +334,27 @@ class OstTdApi(TdApi):
         """委托撤单失败回报"""
         self.gateway.write_error("交易撤单失败", error)
 
-    def onRspSettlementInfoConfirm(self, data: dict, error: dict, reqid: int, last: bool) -> None:
-        """确认结算单回报"""
-        self.gateway.write_log("结算信息确认成功")
-
-        # 由于流控，单次查询可能失败，通过while循环持续尝试，直到成功发出请求
-        while True:
-            self.reqid += 1
-            n: int = self.reqQryInstrument({}, self.reqid)
-
-            if not n:
-                break
-            else:
-                sleep(1)
-
     def onRspQryInvestorPosition(self, data: dict, error: dict, reqid: int, last: bool) -> None:
         """持仓查询回报"""
         if not data:
             return
 
         # 必须已经收到了合约信息后才能处理
-        symbol: str = data["InstrumentID"]
-        contract: ContractData = symbol_contract_map.get(symbol, None)
+        contract: ContractData = symbol_contract_map.get(data["InstrumentID"], None)
 
         if contract:
-            # 获取之前缓存的持仓数据缓存
-            key: str = f"{data['InstrumentID'], data['PosiDirection']}"
-            position: PositionData = self.positions.get(key, None)
-            if not position:
-                position: PositionData = PositionData(
-                    symbol=data["InstrumentID"],
-                    exchange=contract.exchange,
-                    direction=Direction.NET,
-                    gateway_name=self.gateway_name
-                )
-                self.positions[key] = position
-
-            # 对于上期所昨仓需要特殊处理
-            if position.exchange in [Exchange.SHFE, Exchange.INE]:
-                if data["YdPosition"] and not data["TodayPosition"]:
-                    position.yd_volume = data["Position"]
-            # 对于其他交易所昨仓的计算
-            else:
-                position.yd_volume = data["Position"] - data["TodayPosition"]
-
-            # 获取合约的乘数信息
-            size: int = contract.size
-
-            # 计算之前已有仓位的持仓总成本
-            cost: float = position.price * position.volume * size
-
-            # 累加更新持仓数量和盈亏
-            position.volume += data["Position"]
-            position.pnl += data["PositionProfit"]
-
-            # 计算更新后的持仓总成本和均价
-            if position.volume and size:
-                cost += data["PositionCost"]
-                position.price = cost / (position.volume * size)
-
-            # 更新仓位冻结数量
-            if position.direction == Direction.LONG:
-                position.frozen += data["ShortFrozen"]
-            else:
-                position.frozen += data["LongFrozen"]
-
-        if last:
-            for position in self.positions.values():
-                self.gateway.on_position(position)
-
-            self.positions.clear()
+            position: PositionData = PositionData(
+                symbol=contract.symbol,
+                exchange=contract.exchange,
+                direction=Direction.NET,
+                volume=data["Position"],
+                frozen=data["LongFrozen"],
+                price=data["PositionCost"],
+                pnl=data["PositionProfit"],
+                yd_volume=data["YdPosition"],
+                gateway_name=self.gateway_name
+            )
+            self.gateway.on_position(position)
 
     def onRspQryTradingAccount(self, data: dict, error: dict, reqid: int, last: bool) -> None:
         """资金查询回报"""
@@ -425,8 +363,8 @@ class OstTdApi(TdApi):
 
         account: AccountData = AccountData(
             accountid=data["AccountID"],
-            balance=data["Balance"],
-            frozen=data["FrozenMargin"] + data["FrozenCash"] + data["FrozenCommission"],
+            balance=data["Available"] + data["FrozenCash"],
+            frozen=data["FrozenCash"],
             gateway_name=self.gateway_name
         )
         account.available = data["Available"]
@@ -444,6 +382,7 @@ class OstTdApi(TdApi):
                 product=product,
                 size=data["VolumeMultiple"],
                 pricetick=data["PriceTick"],
+                net_position=True,
                 gateway_name=self.gateway_name
             )
 
@@ -474,10 +413,10 @@ class OstTdApi(TdApi):
 
         frontid: int = data["FrontID"]
         sessionid: int = data["SessionID"]
-        order_ref: str = data["OrderRef"]
+        order_ref: int = data["OrderRef"]
         orderid: str = f"{frontid}_{sessionid}_{order_ref}"
 
-        timestamp: str = f"{data['InsertDate']} {data['InsertTime']}"
+        timestamp: str = f"{data['TradingDay']} {data['InsertTime']}"
         dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H:%M:%S")
         dt: datetime = CHINA_TZ.localize(dt)
 
@@ -487,18 +426,21 @@ class OstTdApi(TdApi):
             symbol=symbol,
             exchange=contract.exchange,
             orderid=orderid,
-            type=ORDERTYPE_CTP2VT[tp],
+            type=ORDERTYPE_OST2VT[tp],
             direction=DIRECTION_OST2VT[data["Direction"]],
             price=data["LimitPrice"],
             volume=data["VolumeTotalOriginal"],
-            traded=data["VolumeTraded"],
+            traded=data["VolumeTotalOriginal"]-data["VolumeTotal"],
             status=STATUS_OST2VT[data["OrderStatus"]],
             datetime=dt,
             gateway_name=self.gateway_name
         )
-        self.gateway.on_order(order)
 
-        self.sysid_orderid_map[data["OrderSysID"]] = orderid
+        if data["ExchangeErrorID"]:
+            order.status = Status.REJECTED
+
+        self.gateway.on_order(order)
+        self.sysid_orderid_map[data["OrderLocalID"]] = orderid
 
     def onRtnTrade(self, data: dict) -> None:
         """成交数据推送"""
@@ -509,7 +451,7 @@ class OstTdApi(TdApi):
         symbol: str = data["InstrumentID"]
         contract: ContractData = symbol_contract_map[symbol]
 
-        orderid: str = self.sysid_orderid_map[data["OrderSysID"]]
+        orderid: str = self.sysid_orderid_map[data["OrderLocalID"]]
 
         timestamp: str = f"{data['TradeDate']} {data['TradeTime']}"
         dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H:%M:%S")
@@ -528,56 +470,25 @@ class OstTdApi(TdApi):
         )
         self.gateway.on_trade(trade)
 
-    def onRspForQuoteInsert(self, data: dict, error: dict, reqid: int, last: bool) -> None:
-        """询价请求回报"""
-        if not error["ErrorID"]:
-            symbol: str = data["InstrumentID"]
-            msg: str = f"{symbol}询价请求发送成功"
-            self.gateway.write_log(msg)
-        else:
-            self.gateway.write_error("询价请求发送失败", error)
-
     def connect(
         self,
         address: str,
         userid: str,
-        password: str,
-        brokerid: int,
-        auth_code: str,
-        appid: str
+        password: str
     ) -> None:
         """连接服务器"""
         self.userid = userid
         self.password = password
-        self.brokerid = brokerid
-        self.auth_code = auth_code
-        self.appid = appid
 
         if not self.connect_status:
             path: Path = get_folder_path(self.gateway_name.lower())
-            self.createFtdcTraderApi((str(path) + "\\Td").encode("GBK"))
-
-            self.subscribePrivateTopic(0)
-            self.subscribePublicTopic(0)
+            self.createApi((str(path) + "\\Td").encode("GBK"))
 
             self.registerFront(address)
+            self.subscribePrivateTopic(0)
             self.init()
 
             self.connect_status = True
-        else:
-            self.authenticate()
-
-    def authenticate(self) -> None:
-        """发起授权验证"""
-        ost_req: dict = {
-            "UserID": self.userid,
-            "BrokerID": self.brokerid,
-            "AuthCode": self.auth_code,
-            "AppID": self.appid
-        }
-
-        self.reqid += 1
-        self.reqAuthenticate(ost_req, self.reqid)
 
     def login(self) -> None:
         """用户登录"""
@@ -586,44 +497,45 @@ class OstTdApi(TdApi):
 
         ost_req: dict = {
             "UserID": self.userid,
-            "Password": self.password,
-            "BrokerID": self.brokerid,
-            "AppID": self.appid
+            "Password": self.password
         }
 
         self.reqid += 1
-        self.reqUserLogin(ost_req, self.reqid)
+        self.reqLogin(ost_req, self.reqid)
 
     def send_order(self, req: OrderRequest) -> str:
         """委托下单"""
-        if req.type not in ORDERTYPE_VT2CTP:
+        if req.type not in ORDERTYPE_VT2OST:
             self.gateway.write_log(f"当前接口不支持该类型的委托{req.type.value}")
+            return ""
+
+        if not req.direction:
+            self.gateway.write_log(f"请选择买卖方向")
             return ""
 
         self.order_ref += 1
 
-        tp = ORDERTYPE_VT2CTP[req.type]
+        tp = ORDERTYPE_VT2OST[req.type]
         price_type, time_condition, volume_condition = tp
 
         ost_req: dict = {
-            "InstrumentID": req.symbol,
-            "ExchangeID": req.exchange.value,
-            "LimitPrice": req.price,
-            "VolumeTotalOriginal": int(req.volume),
-            "OrderPriceType": price_type,
-            "Direction": DIRECTION_VT2CTP.get(req.direction, ""),
-            "OrderRef": str(self.order_ref),
             "InvestorID": self.userid,
-            "UserID": self.userid,
-            "BrokerID": self.brokerid,
-            "CombHedgeFlag": THOST_FTDC_HF_Speculation,
-            "ContingentCondition": THOST_FTDC_CC_Immediately,
-            "ForceCloseReason": THOST_FTDC_FCC_NotForceClose,
-            "IsAutoSuspend": 0,
+            "ExchangeID": EXCHANGE_VT2OST[req.exchange],
+            "InstrumentID": req.symbol,
+            "OrderRef": self.order_ref,
+            "Direction": DIRECTION_VT2OST[req.direction],
+            "HedgeFlag": '1',
+            "OrderPriceType": price_type,
+            "VolumeTotalOriginal": int(req.volume),
+            "LimitPrice": req.price,
             "TimeCondition": time_condition,
-            "VolumeCondition": volume_condition,
-            "MinVolume": 1
+            "VolumeCondition": volume_condition
         }
+ 
+        if req.direction == Direction.LONG:
+            ost_req["OffsetFlag"] = '0'
+        else:
+            ost_req["OffsetFlag"] = '1'
 
         self.reqid += 1
         self.reqOrderInsert(ost_req, self.reqid)
@@ -639,14 +551,10 @@ class OstTdApi(TdApi):
         frontid, sessionid, order_ref = req.orderid.split("_")
 
         ost_req: dict = {
-            "InstrumentID": req.symbol,
-            "ExchangeID": req.exchange.value,
-            "OrderRef": order_ref,
             "FrontID": int(frontid),
             "SessionID": int(sessionid),
-            "ActionFlag": THOST_FTDC_AF_Delete,
-            "BrokerID": self.brokerid,
-            "InvestorID": self.userid
+            "OrderRef": int(order_ref),
+            "ActionFlag": '0'
         }
 
         self.reqid += 1
@@ -662,22 +570,10 @@ class OstTdApi(TdApi):
         if not symbol_contract_map:
             return
 
-        ost_req: dict = {
-            "BrokerID": self.brokerid,
-            "InvestorID": self.userid
-        }
-
         self.reqid += 1
-        self.reqQryInvestorPosition(ost_req, self.reqid)
+        self.reqQryInvestorPosition({}, self.reqid)
 
     def close(self) -> None:
         """关闭连接"""
         if self.connect_status:
             self.exit()
-
-
-def generate_datetime(timestamp: float) -> datetime:
-    """生成时间"""
-    dt: datetime = datetime.fromtimestamp(timestamp / 1000)
-    dt: datetime = CHINA_TZ.localize(dt)
-    return dt
