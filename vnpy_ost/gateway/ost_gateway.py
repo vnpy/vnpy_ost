@@ -112,7 +112,7 @@ class OstGateway(BaseGateway):
             td_address = "tcp://" + td_address
 
         self.td_api.connect(td_address, userid, password)
-        self.td_api.connect()
+        self.md_api.connect()
 
         self.init_query()
 
@@ -160,6 +160,8 @@ class OstGateway(BaseGateway):
         func()
         self.query_functions.append(func)
 
+        self.md_api.update_date()
+
     def init_query(self) -> None:
         """初始化查询任务"""
         self.count: int = 0
@@ -180,14 +182,16 @@ class OstMdApi(MdApi):
         self.reqid: int = 0
         self.connect_status: bool = False
 
-    def onRspSubL1MarketData(self, data: dict,) -> None:
+        self.current_date: str = datetime.now().strftime("%Y%m%d")
+
+    def onRspSubL2MarketData(self, data: dict,) -> None:
         """订阅行情回报"""
         if not data or not data["ErrorID"]:
             return
 
         self.gateway.write_log(f"行情订阅失败，错误码{data['ErrorID']}，原因{data['ErrorMsg']}")
 
-    def onRtnL1MarketData(self, data: dict) -> None:
+    def onRtnL2MarketData(self, data: dict) -> None:
         """行情数据推送"""
         # 过滤没有时间戳的异常行情数据
         if not data["origTime"]:
@@ -198,7 +202,8 @@ class OstMdApi(MdApi):
         if not contract:
             return
 
-        dt: datetime = datetime.strptime(data["origTime"], "%Y%m%d%H:%M:%S")
+        timestamp: str = f"{self.current_date}{data['origTime']}"
+        dt: datetime = datetime.strptime(timestamp, "%Y%m%d%H%M%S")
         dt: datetime = CHINA_TZ.localize(dt)
 
         tick: TickData = TickData(
@@ -246,12 +251,17 @@ class OstMdApi(MdApi):
                "securityId": req.symbol,
                "subscribeType": 1
             }
-            self.subscribeL1MarketData(ost_req)
+            self.subscribeL2MarketData(ost_req, False)
 
     def close(self) -> None:
         """关闭连接"""
-        if self.connect_status:
-            self.exit()
+        pass
+#        if self.connect_status:
+#            self.exit()
+
+    def update_date(self) -> None:
+        """更新当前日期"""
+        self.current_date = datetime.now().strftime("%Y%m%d")
 
 
 class OstTdApi(TdApi):
@@ -349,7 +359,7 @@ class OstTdApi(TdApi):
                 direction=Direction.NET,
                 volume=data["Position"],
                 frozen=data["LongFrozen"],
-                price=data["PositionCost"],
+                price=data["PositionCost"]/data["Position"],
                 pnl=data["PositionProfit"],
                 yd_volume=data["YdPosition"],
                 gateway_name=self.gateway_name
@@ -417,7 +427,7 @@ class OstTdApi(TdApi):
         orderid: str = f"{frontid}_{sessionid}_{order_ref}"
 
         timestamp: str = f"{data['TradingDay']} {data['InsertTime']}"
-        dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H:%M:%S")
+        dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
         dt: datetime = CHINA_TZ.localize(dt)
 
         tp = (data["OrderPriceType"], data["TimeCondition"], data["VolumeCondition"])
@@ -454,7 +464,7 @@ class OstTdApi(TdApi):
         orderid: str = self.sysid_orderid_map[data["OrderLocalID"]]
 
         timestamp: str = f"{data['TradeDate']} {data['TradeTime']}"
-        dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H:%M:%S")
+        dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
         dt: datetime = CHINA_TZ.localize(dt)
 
         trade: TradeData = TradeData(
@@ -482,7 +492,7 @@ class OstTdApi(TdApi):
 
         if not self.connect_status:
             path: Path = get_folder_path(self.gateway_name.lower())
-            self.createApi((str(path) + "\\Td").encode("GBK"))
+            self.createApi((str(path) + "\\Td").encode("GBK"), 0)
 
             self.registerFront(address)
             self.subscribePrivateTopic(0)
