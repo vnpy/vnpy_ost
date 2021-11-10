@@ -526,21 +526,21 @@ void MdApi::processRtnL2MarketData(Task *task)
 	data["origTime"] = task_data->origTime;
 	data["channelNo"] = task_data->channelNo;
 	data["marketId"] = task_data->marketId;
-	data["MDStreamId"] = task_data->MDStreamId;
-	data["MDStreamType"] = task_data->MDStreamType;
+	//data["MDStreamId"] = task_data->MDStreamId;
+	//data["MDStreamType"] = task_data->MDStreamType;
 	data["securityId"] = toUtf(task_data->securityId);
-	data["preClosePx"] = task_data->preClosePx;
-	data["openPx"] = task_data->openPx;
-	data["closePx"] = task_data->closePx;
-	data["lastPx"] = task_data->lastPx;
-	data["highPx"] = task_data->highPx;
-	data["lowPx"] = task_data->lowPx;
-	data["upperLimit"] = task_data->upperLimit;
-	data["lowerLimit"] = task_data->lowerLimit;
-	data["tradingPhase"] = task_data->tradingPhase;
-	data["tradeNums"] = task_data->tradeNums;
-	data["tradeVolumn"] = task_data->tradeVolumn;
-	data["tradeValue"] = task_data->tradeValue;
+	data["preClosePx"] = task_data->preClosePx/10000.0;
+	data["openPx"] = task_data->openPx/10000.0;
+	data["closePx"] = task_data->closePx/10000.0;
+	data["lastPx"] = task_data->lastPx/10000.0;
+	data["highPx"] = task_data->highPx/10000.0;
+	data["lowPx"] = task_data->lowPx/10000.0;
+	data["upperLimit"] = task_data->upperLimit/10000.0;
+	data["lowerLimit"] = task_data->lowerLimit/10000.0;
+	//data["tradingPhase"] = task_data->tradingPhase;
+	data["tradeNums"] = task_data->tradeNums/100.0;
+	data["tradeVolumn"] = task_data->tradeVolumn/100.0;
+	data["tradeValue"] = task_data->tradeValue/100.0;
 	data["buyLength"] = task_data->buyLength;
 	data["sellLength"] = task_data->sellLength;
 
@@ -551,17 +551,16 @@ void MdApi::processRtnL2MarketData(Task *task)
 
 	for (int i = 0; i < 10; i++)
 	{
-		ask.append(task_data->sellEntry[i].price);
-		ask_qty.append(task_data->sellEntry[i].OrderQty);
-		bid.append(task_data->buyEntry[i].price);
-		bid_qty.append(task_data->buyEntry[i].OrderQty);
+		ask.append(task_data->sellEntry[i].price/10000.0);
+		ask_qty.append(task_data->sellEntry[i].OrderQty/100.0);
+		bid.append(task_data->buyEntry[i].price/10000.0);
+		bid_qty.append(task_data->buyEntry[i].OrderQty/100.0);
 	}
 
 	data["ask"] = ask;
 	data["bid"] = bid;
 	data["bid_qty"] = bid_qty;
 	data["ask_qty"] = ask_qty;
-
 	delete task_data;
 	this->onRtnL2MarketData(data);
 };
@@ -635,6 +634,8 @@ void MdApi::createCSecurityDntL2MDUserApi()
 {
 	this->api = CSecurityDntL2MDUserApi::createCSecurityDntL2MDUserApi();
 	this->api->RegisterSpi(this);
+	this->active = true;
+	this->task_thread = thread(&MdApi::processTask, this);
 };
 
 void MdApi::release()

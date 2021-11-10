@@ -109,50 +109,50 @@ void getDouble(const dict &d, const char *key, double *value)
 };
 
 
-void getInt64(const dict &d, const char *key, INT64 *value)
+void getInt64(const dict &d, const char *key, signed long long *value)
 {
 	if (d.contains(key))		//检查字典中是否存在该键值
 	{
 		object o = d[key];		//获取该键值
-		*value = o.cast<INT64>();
+		*value = o.cast<signed long long>();
 	}
 };
 
 
-void getInt32(const dict &d, const char *key, INT32 *value)
+void getInt32(const dict &d, const char *key, signed int *value)
 {
 	if (d.contains(key))		//检查字典中是否存在该键值
 	{
 		object o = d[key];		//获取该键值
-		*value = o.cast<INT32>();
+		*value = o.cast<signed int>();
 	}
 };
 
-void getUint16(const dict &d, const char *key, UINT16 *value)
+void getUint16(const dict &d, const char *key, unsigned short *value)
 {
 	if (d.contains(key))		//检查字典中是否存在该键值
 	{
 		object o = d[key];		//获取该键值
-		*value = o.cast<UINT16>();
+		*value = o.cast<unsigned short>();
 	}
 };
 
-void getUint32(const dict &d, const char *key, UINT32 *value)
+void getUint32(const dict &d, const char *key, unsigned int *value)
 {
 	if (d.contains(key))		//检查字典中是否存在该键值
 	{
 		object o = d[key];		//获取该键值
-		*value = o.cast<UINT32>();
+		*value = o.cast<unsigned int>();
 	}
 };
 
 
-void getUint64(const dict &d, const char *key, UINT64 *value)
+void getUint64(const dict &d, const char *key, unsigned long long *value)
 {
 	if (d.contains(key))		//检查字典中是否存在该键值
 	{
 		object o = d[key];		//获取该键值
-		*value = o.cast<UINT64>();
+		*value = o.cast<unsigned long long>();
 	}
 };
 
