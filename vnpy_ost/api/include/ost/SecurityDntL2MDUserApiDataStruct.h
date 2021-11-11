@@ -4,16 +4,32 @@
 #include "SecurityDntL2MDUserApiDataType.h"
 
 _DNT_NS_BEGIN_
-#pragma pack(push)
-#pragma pack(1)
+/******************初始化参数****************/
+struct CUDPAddrInfo {
+	TAddress	Addr;			 // 地址
+	TPort		Port;			 // 端口
+public:
+	CUDPAddrInfo() {
+		memset(this, 0, sizeof(CUDPAddrInfo));
+	}
+};
+
+struct CMulitcastInfo {
+	TMDType		 MDType;		 // 订阅类型
+	CUDPAddrInfo RemoteAddr;	 // 远程地址
+	CUDPAddrInfo LocalAddr;		 // 本机地址
+public:
+	CMulitcastInfo() {
+		memset(this, 0, sizeof(CMulitcastInfo));
+	}
+};
 
 /******************请求参数****************/
 
 // 行情订阅请求参数
 struct CSecurityDntSubscribeReq {
-	TSecuritySourceType     securitySource;    // 市场编号
-	TSecurityIdType         securityId;        // 产品代码
-	ESubscribeType          subscribeType;     // 订阅类型
+	TSecuritySourceType     SecuritySource;    // 市场编号
+	TSecurityIdType         SecurityId;        // 产品代码
 public:
 	CSecurityDntSubscribeReq() {
 		memset(this, 0, sizeof(CSecurityDntSubscribeReq));
@@ -33,11 +49,9 @@ public:
 
 // 档位信息
 struct EntryInfo {
-	TLevelType          level;              // 档位
-	TPriceType          price;              // 价格
+	TLevelType          Level;              // 档位
+	TPriceType          Price;              // 价格
 	TOrderQty           OrderQty;           // 数量
-//	TNumOrder           NumOrder;           // 总委托笔数
-
 public:
 	EntryInfo() {
 		memset(this, 0, sizeof(EntryInfo));
@@ -48,28 +62,28 @@ typedef EntryInfo EntryInfoList[10];
 
 // 快照行情信息
 struct CSecurityDntMarketDataField {
-	TLocalTimeStampType         origTime;           // 时间戳
-	TChannelNoType              channelNo;          // 频道代码
-	TSecuritySourceType         marketId;           // 市场代码
+	TLocalTimeStampType         OrigTime;           // 时间戳
+	TChannelNoType              ChannelNo;          // 频道代码
+	TSecuritySourceType         MarketId;           // 市场代码
 	EMDStreamId                 MDStreamId;         // 行情类别
 	EMDStreamType               MDStreamType;       // 行情类别
-	TSecurityIdType             securityId;         // 产品代码
-	TPriceType                  preClosePx;         // 昨收价
-	TPriceType                  openPx;             // 开盘价
-	TPriceType                  closePx;            // 收盘价
-	TPriceType                  lastPx;             // 最新价
-	TPriceType                  highPx;             // 最高价
-	TPriceType                  lowPx;              // 最低价
-	TPriceType                  upperLimit;         // 涨停价
-	TPriceType                  lowerLimit;         // 跌停价
-	TTradingPhaseType           tradingPhase;       // 交易阶段
-	TOrderQty                   tradeNums;          // 成交笔数
-	TOrderQty                   tradeVolumn;        // 成交总量
-	TPriceType                   tradeValue;         // 成交总金额
-	TBuyLengthType              buyLength;          // 买盘结果集个数
-	EntryInfoList               buyEntry;           // 买一至买十列表
-	TsellLengthType             sellLength;         // 卖盘结果集个数
-	EntryInfoList               sellEntry;          // 卖一至卖十列表
+	TSecurityIdType             SecurityId;         // 产品代码
+	TPriceType                  PreClosePx;         // 昨收价
+	TPriceType                  OpenPx;             // 开盘价
+	TPriceType                  ClosePx;            // 收盘价
+	TPriceType                  LastPx;             // 最新价
+	TPriceType                  HighPx;             // 最高价
+	TPriceType                  LowPx;              // 最低价
+	TPriceType                  UpperLimit;         // 涨停价
+	TPriceType                  LowerLimit;         // 跌停价
+	TTradingPhaseType           TradingPhase;       // 交易阶段
+	TOrderQty                   TradeNums;          // 成交笔数
+	TOrderQty                   TradeVolumn;        // 成交总量
+	TPriceType                  TradeValue;         // 成交总金额
+	TBuyLengthType              BuyLength;          // 买盘结果集个数
+	EntryInfoList               BuyEntry;           // 买一至买十列表
+	TsellLengthType             SellLength;         // 卖盘结果集个数
+	EntryInfoList               SellEntry;          // 卖一至卖十列表
 public:
 	CSecurityDntMarketDataField() {
 		memset(this, 0, sizeof(CSecurityDntMarketDataField));
@@ -79,7 +93,7 @@ public:
 // 逐笔成交行情
 struct CSecurityDntL2TradeField {
 	TChannelNoType              ChannelNo;                  // 频道代码
-	TSecuritySourceType         marketId;                   // 市场代码
+	TSecuritySourceType         MarketId;                   // 市场代码
 	TSeqNumType                 ApplSeqNum;          	    // 消息记录号
 	EMDStreamId                 MDStreamID;                 // 行情类别
 	TSeqNumType                 BidApplSeqNum;              // 买方委托索引 0表示无委托
@@ -99,7 +113,7 @@ public:
 // 逐笔委托行情信息
 struct CSecurityDntL2OrderField {
 	TChannelNoType              ChannelNo;                  // 频道代码
-	TSecuritySourceType         marketId;                   // 市场代码
+	TSecuritySourceType         MarketId;                   // 市场代码
 	TSeqNumType                 ApplSeqNum;                 // 消息记录号
 	EMDStreamId                 MDStreamID;                 // 行情类别
 	TSecurityIdType             SecurityID;                 // 证券代码
@@ -118,24 +132,23 @@ public:
 
 //指数信息
 struct CSecurityDntL2IndexField {
-	TLocalTimeStampType			timeStamp;					// 时间
-	TSecuritySourceType			marketId;					// 市场代码
+	TLocalTimeStampType			TimeStamp;					// 时间
+	TSecuritySourceType			MarketId;					// 市场代码
 	TSecurityIdType				SecurityID;					// 指数代码
-	TPriceType					preCloseIndex;				// 昨收价
-	TPriceType					openIndex;					// 开盘价
-	TPriceType					closeIndex;					// 收盘价
-	TPriceType					highIndex;					// 最高价
-	TPriceType					lowIndex;					// 最低价
-	TPriceType					lastIndex;					// 最新价
-	TPriceType					turnOver;					//参与计算相应指数的成交金额
-	TOrderQty					totalVolume;				//参与计算相应指数的成交数量
+	TPriceType					PreCloseIndex;				// 昨收价
+	TPriceType					OpenIndex;					// 开盘价
+	TPriceType					CloseIndex;					// 收盘价
+	TPriceType					HighIndex;					// 最高价
+	TPriceType					LowIndex;					// 最低价
+	TPriceType					LastIndex;					// 最新价
+	TPriceType					TurnOver;					// 参与计算相应指数的成交金额
+	TOrderQty					TotalVolume;				// 参与计算相应指数的成交数量
 public:
 	CSecurityDntL2IndexField() {
 		memset(this, 0, sizeof(CSecurityDntL2IndexField));
 	}
 };
 
-#pragma pack(pop)
 _DNT_NS_END_
 
 #endif // __H_SECURITY_Dnt_L2_MD_USER_API_STRUCT_H__

@@ -1,4 +1,4 @@
-//ÏµÍ³
+//ç³»ç»Ÿ
 #ifdef WIN32
 #include "stdafx.h"
 #endif
@@ -10,39 +10,32 @@
 
 using namespace pybind11;
 
-//³£Á¿
-#define ONFRONTCONNECTED 0
-#define ONRSPSUBFUTUREMARKETDATA 1
-#define ONRSPUNSUBFUTUREMARKETDATA 2
-#define ONRSPSUBL2MARKETDATA 3
-#define ONRSPUNSUBL2MARKETDATA 4
-#define ONRSPSUBL1MARKETDATA 5
-#define ONRSPUNSUBL1MARKETDATA 6
-#define ONRSPSUBL2ORDERANDTRADE 7
-#define ONRSPUNSUBL2ORDERANDTRADE 8
-#define ONRSPSUBL2INDEXMARKETDATA 9
-#define ONRSPUNSUBL2INDEXMARKETDATA 10
-#define ONRTNL1MARKETDATA 11
-#define ONRTNFUTUREMARKETDATA 12
-#define ONRTNL2MARKETDATA 13
-#define ONRTNL2INDEXMARKETDATA 14
-#define ONRTNL2ORDER 15
-#define ONRTNL2TRADE 16
+//å¸¸é‡
+#define ONRSPSUBL2MARKETDATA 0
+#define ONRSPUNSUBL2MARKETDATA 1
+#define ONRSPSUBL2ORDERANDTRADE 2
+#define ONRSPUNSUBL2ORDERANDTRADE 3
+#define ONRSPSUBL2INDEXMARKETDATA 4
+#define ONRSPUNSUBL2INDEXMARKETDATA 5
+#define ONRTNL2MARKETDATA 6
+#define ONRTNL2INDEXMARKETDATA 7
+#define ONRTNL2ORDER 8
+#define ONRTNL2TRADE 9
 
 
 ///-------------------------------------------------------------------------------------
-///C++ SPIµÄ»Øµ÷º¯Êı·½·¨ÊµÏÖ
+///C++ SPIçš„å›è°ƒå‡½æ•°æ–¹æ³•å®ç°
 ///-------------------------------------------------------------------------------------
 
-//APIµÄ¼Ì³ĞÊµÏÖ
+//APIçš„ç»§æ‰¿å®ç°
 using namespace _DNT_;
 class MdApi : public CSecurityDntL2MDUserSpi
 {
 private:
-	CSecurityDntL2MDUserApi* api;				//API¶ÔÏó
-	thread task_thread;					//¹¤×÷Ïß³ÌÖ¸Õë£¨ÏòpythonÖĞÍÆËÍÊı¾İ£©
-	TaskQueue task_queue;			    //ÈÎÎñ¶ÓÁĞ
-	bool active = false;				//¹¤×÷×´Ì¬
+	CSecurityDntL2MDUserApi* api;				//APIå¯¹è±¡
+	thread task_thread;					//å·¥ä½œçº¿ç¨‹æŒ‡é’ˆï¼ˆå‘pythonä¸­æ¨é€æ•°æ®ï¼‰
+	TaskQueue task_queue;			    //ä»»åŠ¡é˜Ÿåˆ—
+	bool active = false;				//å·¥ä½œçŠ¶æ€
 
 public:
 	MdApi()
@@ -58,144 +51,95 @@ public:
 	};
 
 	//-------------------------------------------------------------------------------------
-	//API»Øµ÷º¯Êı
+	//APIå›è°ƒå‡½æ•°
 	//-------------------------------------------------------------------------------------
 
-	// Á¬½ÓÇ°ÖÃ»úÏìÓ¦
-	virtual void OnFrontConnected(const CSecurityDntRspInfoField& reply);
-
-	// ¶©ÔÄÆÚÈ¨ĞĞÇéÓ¦´ğ
-	virtual void OnRspSubFutureMarketData(const CSecurityDntRspInfoField& reply);
-
-	// È¡Ïû¶©ÔÄÆÚÈ¨ĞĞÇéÓ¦´ğ
-	virtual void OnRspUnSubFutureMarketData(const CSecurityDntRspInfoField& reply);
-
-	// ¶©ÔÄL2ĞĞÇéÓ¦´ğ
+	/// è®¢é˜…L2è¡Œæƒ…åº”ç­”
 	virtual void OnRspSubL2MarketData(const CSecurityDntRspInfoField& reply);
 
-	// È¡Ïû¶©ÔÄLevel2ĞĞÇéÓ¦´ğ
+	/// å–æ¶ˆè®¢é˜…Level2è¡Œæƒ…åº”ç­”
 	virtual void OnRspUnSubL2MarketData(const CSecurityDntRspInfoField& reply);
 
-	// ¶©ÔÄL1ĞĞÇéÓ¦´ğ
-	virtual void OnRspSubL1MarketData(const CSecurityDntRspInfoField& reply);
-
-	// È¡Ïû¶©ÔÄLevel1ĞĞÇéÓ¦´ğ
-	virtual void OnRspUnSubL1MarketData(const CSecurityDntRspInfoField& reply);
-
-	//Öğ±Ê¶©ÔÄÓ¦´ğ
+	/// é€ç¬”è®¢é˜…åº”ç­”
 	virtual void OnRspSubL2OrderAndTrade(const CSecurityDntRspInfoField& reply);
 
-	//È¡ÏûÖğ±Ê¶©ÔÄÓ¦´ğ
+	/// å–æ¶ˆé€ç¬”è®¢é˜…åº”ç­”
 	virtual void OnRspUnSubL2OrderAndTrade(const CSecurityDntRspInfoField& reply);
 
-	//Ö¸Êı¶©ÔÄÓ¦´ğ
+	/// æŒ‡æ•°è®¢é˜…åº”ç­”
 	virtual void OnRspSubL2IndexMarketData(const CSecurityDntRspInfoField& reply);
 
-	//È¡ÏûÖ¸Êı¶©ÔÄÓ¦´ğ
+	/// å–æ¶ˆæŒ‡æ•°è®¢é˜…åº”ç­”
 	virtual void OnRspUnSubL2IndexMarketData(const CSecurityDntRspInfoField& reply);
 
-	// Level1ĞĞÇéÍ¨Öª
-	virtual void OnRtnL1MarketData(const CSecurityDntMarketDataField& reply);
-
-	// ÆÚÈ¨ĞĞÇéÍ¨Öª
-	virtual void OnRtnFutureMarketData(const CSecurityDntMarketDataField& reply);
-
-	// Level2ĞĞÇéÍ¨Öª
+	/// Level2è¡Œæƒ…é€šçŸ¥
 	virtual void OnRtnL2MarketData(const CSecurityDntMarketDataField& reply);
 
-	// Level2Ö¸ÊıÍ¨Öª
+	/// Level2æŒ‡æ•°é€šçŸ¥
 	virtual void OnRtnL2IndexMarketData(const CSecurityDntL2IndexField& reply);
 
-	// Level2Öğ±ÊÎ¯ÍĞĞĞÇéÍ¨Öª
+	/// Level2é€ç¬”å§”æ‰˜è¡Œæƒ…é€šçŸ¥
 	virtual void OnRtnL2Order(const CSecurityDntL2OrderField& pL2Order);
 
-	// Level2Öğ±Ê³É½»ĞĞÇéÍ¨Öª
+	/// Level2é€ç¬”æˆäº¤è¡Œæƒ…é€šçŸ¥
 	virtual void OnRtnL2Trade(const CSecurityDntL2TradeField& pL2Trade);
 
     //-------------------------------------------------------------------------------------
-    //task£ºÈÎÎñ
+    //taskï¼šä»»åŠ¡
     //-------------------------------------------------------------------------------------
 
 	void processTask();
 
-	void processFrontConnected(Task *task);
-
-	void processRspSubFutureMarketData(Task *task);
-
-	void processRspUnSubFutureMarketData(Task *task);
-
-	void processRspSubL2MarketData(Task *task);
-
-	void processRspUnSubL2MarketData(Task *task);
-
-	void processRspSubL1MarketData(Task *task);
-
-	void processRspUnSubL1MarketData(Task *task);
-
-	void processRspSubL2OrderAndTrade(Task *task);
-
-	void processRspUnSubL2OrderAndTrade(Task *task);
-
-	void processRspSubL2IndexMarketData(Task *task);
-
-	void processRspUnSubL2IndexMarketData(Task *task);
-
-	void processRtnL1MarketData(Task *task);
-
-	void processRtnFutureMarketData(Task *task);
-
-	void processRtnL2MarketData(Task *task);
-
-	void processRtnL2IndexMarketData(Task *task);
-
-	void processRtnL2Order(Task *task);
-
-	void processRtnL2Trade(Task *task);
+    void processRspSubL2MarketData(Task *task);
+    
+    void processRspUnSubL2MarketData(Task *task);
+    
+    void processRspSubL2OrderAndTrade(Task *task);
+    
+    void processRspUnSubL2OrderAndTrade(Task *task);
+    
+    void processRspSubL2IndexMarketData(Task *task);
+    
+    void processRspUnSubL2IndexMarketData(Task *task);
+    
+    void processRtnL2MarketData(Task *task);
+    
+    void processRtnL2IndexMarketData(Task *task);
+    
+    void processRtnL2Order(Task *task);
+    
+    void processRtnL2Trade(Task *task);
 
 	//-------------------------------------------------------------------------------------
-    //data£º»Øµ÷º¯ÊıµÄÊı¾İ×Öµä
-    //error£º»Øµ÷º¯ÊıµÄ´íÎó×Öµä
-    //id£ºÇëÇóid
-    //last£ºÊÇ·ñÎª×îºó·µ»Ø
-    //i£ºÕûÊı
+    //dataï¼šå›è°ƒå‡½æ•°çš„æ•°æ®å­—å…¸
+    //errorï¼šå›è°ƒå‡½æ•°çš„é”™è¯¯å­—å…¸
+    //idï¼šè¯·æ±‚id
+    //lastï¼šæ˜¯å¦ä¸ºæœ€åè¿”å›
+    //iï¼šæ•´æ•°
     //-------------------------------------------------------------------------------------
 
-	virtual void onFrontConnected(const dict &data) {};
-
-	virtual void onRspSubFutureMarketData(const dict &data) {};
-
-	virtual void onRspUnSubFutureMarketData(const dict &data) {};
-
-	virtual void onRspSubL2MarketData(const dict &data) {};
-
-	virtual void onRspUnSubL2MarketData(const dict &data) {};
-
-	virtual void onRspSubL1MarketData(const dict &data) {};
-
-	virtual void onRspUnSubL1MarketData(const dict &data) {};
-
-	virtual void onRspSubL2OrderAndTrade(const dict &data) {};
-
-	virtual void onRspUnSubL2OrderAndTrade(const dict &data) {};
-
-	virtual void onRspSubL2IndexMarketData(const dict &data) {};
-
-	virtual void onRspUnSubL2IndexMarketData(const dict &data) {};
-
-	virtual void onRtnL1MarketData(const dict &data) {};
-
-	virtual void onRtnFutureMarketData(const dict &data) {};
-
-	virtual void onRtnL2MarketData(const dict &data) {};
-
-	virtual void onRtnL2IndexMarketData(const dict &data) {};
-
-	virtual void onRtnL2Order(const dict &data) {};
-
-	virtual void onRtnL2Trade(const dict &data) {};
+    virtual void onRspSubL2MarketData(const dict &data) {};
+    
+    virtual void onRspUnSubL2MarketData(const dict &data) {};
+    
+    virtual void onRspSubL2OrderAndTrade(const dict &data) {};
+    
+    virtual void onRspUnSubL2OrderAndTrade(const dict &data) {};
+    
+    virtual void onRspSubL2IndexMarketData(const dict &data) {};
+    
+    virtual void onRspUnSubL2IndexMarketData(const dict &data) {};
+    
+    virtual void onRtnL2MarketData(const dict &data) {};
+    
+    virtual void onRtnL2IndexMarketData(const dict &data) {};
+    
+    virtual void onRtnL2Order(const dict &data) {};
+    
+    virtual void onRtnL2Trade(const dict &data) {};
 
 	//-------------------------------------------------------------------------------------
-    //req:Ö÷¶¯º¯ÊıµÄÇëÇó×Öµä
+    //req:ä¸»åŠ¨å‡½æ•°çš„è¯·æ±‚å­—å…¸
     //-------------------------------------------------------------------------------------
 
 	void createCSecurityDntL2MDUserApi();
@@ -204,21 +148,11 @@ public:
 
 	int exit();
 
-	void registerFront(string kConnectorAddress, string kDomainServer, string kContextName);
+	void registerFront(const dict &sh_req, const dict &sz_req, uint32_t len);
 
-	string getTradingDay();
+	int subscribeL2MarketData(const dict &req);
 
-	int subscribeFutureMarketData(const dict &req, bool bAll);
-
-	int unSubscribeFutureMarketData(const dict &req, bool bAll);
-
-	int subscribeL1MarketData(const dict &req, bool bAll);
-
-	int unSubscribeL1MarketData(const dict &req, bool bAll);
-
-	int subscribeL2MarketData(const dict &req, bool bAll);
-
-	int unSubscribeL2MarketData(const dict &req, bool bAll);
+	int unSubscribeL2MarketData(const dict &req);
 
 	int subscribeL2OrderAndTrade();
 

@@ -1,36 +1,3 @@
-void MdApi::processFrontConnected(Task *task)
-{
-	gil_scoped_acquire acquire;
-	dict data;
-	CSecurityDntRspInfoField *task_data = (CSecurityDntRspInfoField*)task->task_data;
-	data["ErrorID"] = task_data->ErrorID;
-	data["ErrorMsg"] = toUtf(task_data->ErrorMsg);
-	delete task_data;
-	this->onFrontConnected(data);
-};
-
-void MdApi::processRspSubFutureMarketData(Task *task)
-{
-	gil_scoped_acquire acquire;
-	dict data;
-	CSecurityDntRspInfoField *task_data = (CSecurityDntRspInfoField*)task->task_data;
-	data["ErrorID"] = task_data->ErrorID;
-	data["ErrorMsg"] = toUtf(task_data->ErrorMsg);
-	delete task_data;
-	this->onRspSubFutureMarketData(data);
-};
-
-void MdApi::processRspUnSubFutureMarketData(Task *task)
-{
-	gil_scoped_acquire acquire;
-	dict data;
-	CSecurityDntRspInfoField *task_data = (CSecurityDntRspInfoField*)task->task_data;
-	data["ErrorID"] = task_data->ErrorID;
-	data["ErrorMsg"] = toUtf(task_data->ErrorMsg);
-	delete task_data;
-	this->onRspUnSubFutureMarketData(data);
-};
-
 void MdApi::processRspSubL2MarketData(Task *task)
 {
 	gil_scoped_acquire acquire;
@@ -51,28 +18,6 @@ void MdApi::processRspUnSubL2MarketData(Task *task)
 	data["ErrorMsg"] = toUtf(task_data->ErrorMsg);
 	delete task_data;
 	this->onRspUnSubL2MarketData(data);
-};
-
-void MdApi::processRspSubL1MarketData(Task *task)
-{
-	gil_scoped_acquire acquire;
-	dict data;
-	CSecurityDntRspInfoField *task_data = (CSecurityDntRspInfoField*)task->task_data;
-	data["ErrorID"] = task_data->ErrorID;
-	data["ErrorMsg"] = toUtf(task_data->ErrorMsg);
-	delete task_data;
-	this->onRspSubL1MarketData(data);
-};
-
-void MdApi::processRspUnSubL1MarketData(Task *task)
-{
-	gil_scoped_acquire acquire;
-	dict data;
-	CSecurityDntRspInfoField *task_data = (CSecurityDntRspInfoField*)task->task_data;
-	data["ErrorID"] = task_data->ErrorID;
-	data["ErrorMsg"] = toUtf(task_data->ErrorMsg);
-	delete task_data;
-	this->onRspUnSubL1MarketData(data);
 };
 
 void MdApi::processRspSubL2OrderAndTrade(Task *task)
@@ -119,95 +64,33 @@ void MdApi::processRspUnSubL2IndexMarketData(Task *task)
 	this->onRspUnSubL2IndexMarketData(data);
 };
 
-void MdApi::processRtnL1MarketData(Task *task)
-{
-	gil_scoped_acquire acquire;
-	dict data;
-	CSecurityDntMarketDataField *task_data = (CSecurityDntMarketDataField*)task->task_data;
-	data["origTime"] = task_data->origTime;
-	data["channelNo"] = task_data->channelNo;
-	data["marketId"] = task_data->marketId;
-	data["MDStreamId"] = task_data->MDStreamId;
-	data["MDStreamType"] = task_data->MDStreamType;
-	data["securityId"] = toUtf(task_data->securityId);
-	data["preClosePx"] = task_data->preClosePx;
-	data["openPx"] = task_data->openPx;
-	data["closePx"] = task_data->closePx;
-	data["lastPx"] = task_data->lastPx;
-	data["highPx"] = task_data->highPx;
-	data["lowPx"] = task_data->lowPx;
-	data["upperLimit"] = task_data->upperLimit;
-	data["lowerLimit"] = task_data->lowerLimit;
-	data["tradingPhase"] = task_data->tradingPhase;
-	data["tradeNums"] = task_data->tradeNums;
-	data["tradeVolumn"] = task_data->tradeVolumn;
-	data["tradeValue"] = task_data->tradeValue;
-	data["buyLength"] = task_data->buyLength;
-	data["buyEntry"] = task_data->buyEntry;
-	data["sellLength"] = task_data->sellLength;
-	data["sellEntry"] = task_data->sellEntry;
-	delete task_data;
-	this->onRtnL1MarketData(data);
-};
-
-void MdApi::processRtnFutureMarketData(Task *task)
-{
-	gil_scoped_acquire acquire;
-	dict data;
-	CSecurityDntMarketDataField *task_data = (CSecurityDntMarketDataField*)task->task_data;
-	data["origTime"] = task_data->origTime;
-	data["channelNo"] = task_data->channelNo;
-	data["marketId"] = task_data->marketId;
-	data["MDStreamId"] = task_data->MDStreamId;
-	data["MDStreamType"] = task_data->MDStreamType;
-	data["securityId"] = toUtf(task_data->securityId);
-	data["preClosePx"] = task_data->preClosePx;
-	data["openPx"] = task_data->openPx;
-	data["closePx"] = task_data->closePx;
-	data["lastPx"] = task_data->lastPx;
-	data["highPx"] = task_data->highPx;
-	data["lowPx"] = task_data->lowPx;
-	data["upperLimit"] = task_data->upperLimit;
-	data["lowerLimit"] = task_data->lowerLimit;
-	data["tradingPhase"] = task_data->tradingPhase;
-	data["tradeNums"] = task_data->tradeNums;
-	data["tradeVolumn"] = task_data->tradeVolumn;
-	data["tradeValue"] = task_data->tradeValue;
-	data["buyLength"] = task_data->buyLength;
-	data["buyEntry"] = task_data->buyEntry;
-	data["sellLength"] = task_data->sellLength;
-	data["sellEntry"] = task_data->sellEntry;
-	delete task_data;
-	this->onRtnFutureMarketData(data);
-};
-
 void MdApi::processRtnL2MarketData(Task *task)
 {
 	gil_scoped_acquire acquire;
 	dict data;
 	CSecurityDntMarketDataField *task_data = (CSecurityDntMarketDataField*)task->task_data;
-	data["origTime"] = task_data->origTime;
-	data["channelNo"] = task_data->channelNo;
-	data["marketId"] = task_data->marketId;
+	data["OrigTime"] = task_data->OrigTime;
+	data["ChannelNo"] = task_data->ChannelNo;
+	data["MarketId"] = task_data->MarketId;
 	data["MDStreamId"] = task_data->MDStreamId;
 	data["MDStreamType"] = task_data->MDStreamType;
-	data["securityId"] = toUtf(task_data->securityId);
-	data["preClosePx"] = task_data->preClosePx;
-	data["openPx"] = task_data->openPx;
-	data["closePx"] = task_data->closePx;
-	data["lastPx"] = task_data->lastPx;
-	data["highPx"] = task_data->highPx;
-	data["lowPx"] = task_data->lowPx;
-	data["upperLimit"] = task_data->upperLimit;
-	data["lowerLimit"] = task_data->lowerLimit;
-	data["tradingPhase"] = task_data->tradingPhase;
-	data["tradeNums"] = task_data->tradeNums;
-	data["tradeVolumn"] = task_data->tradeVolumn;
-	data["tradeValue"] = task_data->tradeValue;
-	data["buyLength"] = task_data->buyLength;
-	data["buyEntry"] = task_data->buyEntry;
-	data["sellLength"] = task_data->sellLength;
-	data["sellEntry"] = task_data->sellEntry;
+	data["SecurityId"] = toUtf(task_data->SecurityId);
+	data["PreClosePx"] = task_data->PreClosePx;
+	data["OpenPx"] = task_data->OpenPx;
+	data["ClosePx"] = task_data->ClosePx;
+	data["LastPx"] = task_data->LastPx;
+	data["HighPx"] = task_data->HighPx;
+	data["LowPx"] = task_data->LowPx;
+	data["UpperLimit"] = task_data->UpperLimit;
+	data["LowerLimit"] = task_data->LowerLimit;
+	data["TradingPhase"] = task_data->TradingPhase;
+	data["TradeNums"] = task_data->TradeNums;
+	data["TradeVolumn"] = task_data->TradeVolumn;
+	data["TradeValue"] = task_data->TradeValue;
+	data["BuyLength"] = task_data->BuyLength;
+	data["BuyEntry"] = task_data->BuyEntry;
+	data["SellLength"] = task_data->SellLength;
+	data["SellEntry"] = task_data->SellEntry;
 	delete task_data;
 	this->onRtnL2MarketData(data);
 };
@@ -217,17 +100,17 @@ void MdApi::processRtnL2IndexMarketData(Task *task)
 	gil_scoped_acquire acquire;
 	dict data;
 	CSecurityDntL2IndexField *task_data = (CSecurityDntL2IndexField*)task->task_data;
-	data["timeStamp"] = task_data->timeStamp;
-	data["marketId"] = task_data->marketId;
+	data["TimeStamp"] = task_data->TimeStamp;
+	data["MarketId"] = task_data->MarketId;
 	data["SecurityID"] = toUtf(task_data->SecurityID);
-	data["preCloseIndex"] = task_data->preCloseIndex;
-	data["openIndex"] = task_data->openIndex;
-	data["closeIndex"] = task_data->closeIndex;
-	data["highIndex"] = task_data->highIndex;
-	data["lowIndex"] = task_data->lowIndex;
-	data["lastIndex"] = task_data->lastIndex;
-	data["turnOver"] = task_data->turnOver;
-	data["totalVolume"] = task_data->totalVolume;
+	data["PreCloseIndex"] = task_data->PreCloseIndex;
+	data["OpenIndex"] = task_data->OpenIndex;
+	data["CloseIndex"] = task_data->CloseIndex;
+	data["HighIndex"] = task_data->HighIndex;
+	data["LowIndex"] = task_data->LowIndex;
+	data["LastIndex"] = task_data->LastIndex;
+	data["TurnOver"] = task_data->TurnOver;
+	data["TotalVolume"] = task_data->TotalVolume;
 	delete task_data;
 	this->onRtnL2IndexMarketData(data);
 };
@@ -238,7 +121,7 @@ void MdApi::processRtnL2Order(Task *task)
 	dict data;
 	CSecurityDntL2OrderField *task_data = (CSecurityDntL2OrderField*)task->task_data;
 	data["ChannelNo"] = task_data->ChannelNo;
-	data["marketId"] = task_data->marketId;
+	data["MarketId"] = task_data->MarketId;
 	data["ApplSeqNum"] = task_data->ApplSeqNum;
 	data["MDStreamID"] = task_data->MDStreamID;
 	data["SecurityID"] = toUtf(task_data->SecurityID);
@@ -258,7 +141,7 @@ void MdApi::processRtnL2Trade(Task *task)
 	dict data;
 	CSecurityDntL2TradeField *task_data = (CSecurityDntL2TradeField*)task->task_data;
 	data["ChannelNo"] = task_data->ChannelNo;
-	data["marketId"] = task_data->marketId;
+	data["MarketId"] = task_data->MarketId;
 	data["ApplSeqNum"] = task_data->ApplSeqNum;
 	data["MDStreamID"] = task_data->MDStreamID;
 	data["BidApplSeqNum"] = task_data->BidApplSeqNum;

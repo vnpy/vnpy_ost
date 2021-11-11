@@ -1,21 +1,3 @@
-case ONFRONTCONNECTED:
-{
-	this->processFrontConnected(&task);
-	break;
-}
-
-case ONRSPSUBFUTUREMARKETDATA:
-{
-	this->processRspSubFutureMarketData(&task);
-	break;
-}
-
-case ONRSPUNSUBFUTUREMARKETDATA:
-{
-	this->processRspUnSubFutureMarketData(&task);
-	break;
-}
-
 case ONRSPSUBL2MARKETDATA:
 {
 	this->processRspSubL2MarketData(&task);
@@ -25,18 +7,6 @@ case ONRSPSUBL2MARKETDATA:
 case ONRSPUNSUBL2MARKETDATA:
 {
 	this->processRspUnSubL2MarketData(&task);
-	break;
-}
-
-case ONRSPSUBL1MARKETDATA:
-{
-	this->processRspSubL1MarketData(&task);
-	break;
-}
-
-case ONRSPUNSUBL1MARKETDATA:
-{
-	this->processRspUnSubL1MarketData(&task);
 	break;
 }
 
@@ -61,18 +31,6 @@ case ONRSPSUBL2INDEXMARKETDATA:
 case ONRSPUNSUBL2INDEXMARKETDATA:
 {
 	this->processRspUnSubL2IndexMarketData(&task);
-	break;
-}
-
-case ONRTNL1MARKETDATA:
-{
-	this->processRtnL1MarketData(&task);
-	break;
-}
-
-case ONRTNFUTUREMARKETDATA:
-{
-	this->processRtnFutureMarketData(&task);
 	break;
 }
 
