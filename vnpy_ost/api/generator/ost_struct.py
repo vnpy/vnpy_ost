@@ -1,7 +1,17 @@
+CUDPAddrInfo = {
+    "Addr": "string",
+    "Port": "int32_t",
+}
+
+CMulitcastInfo = {
+    "MDType": "uint16_t",
+    "RemoteAddr": "dict",
+    "LocalAddr": "dict",
+}
+
 CSecurityDntSubscribeReq = {
-    "securitySource": "uint16_t",
-    "securityId": "string",
-    "subscribeType": "enum",
+    "SecuritySource": "uint16_t",
+    "SecurityId": "string",
 }
 
 CSecurityDntRspInfoField = {
@@ -10,39 +20,39 @@ CSecurityDntRspInfoField = {
 }
 
 EntryInfo = {
-    "level": "uint16_t",
-    "price": "int64_t",
+    "Level": "uint16_t",
+    "Price": "int64_t",
     "OrderQty": "int64_t",
 }
 
 CSecurityDntMarketDataField = {
-    "origTime": "int64_t",
-    "channelNo": "uint16_t",
-    "marketId": "uint16_t",
+    "OrigTime": "int64_t",
+    "ChannelNo": "uint16_t",
+    "MarketId": "uint16_t",
     "MDStreamId": "enum",
     "MDStreamType": "enum",
-    "securityId": "string",
-    "preClosePx": "int64_t",
-    "openPx": "int64_t",
-    "closePx": "int64_t",
-    "lastPx": "int64_t",
-    "highPx": "int64_t",
-    "lowPx": "int64_t",
-    "upperLimit": "int64_t",
-    "lowerLimit": "int64_t",
-    "tradingPhase": "char",
-    "tradeNums": "int64_t",
-    "tradeVolumn": "int64_t",
-    "tradeValue": "int64_t",
-    "buyLength": "uint16_t",
-    "buyEntry": "dict",
-    "sellLength": "uint16_t",
-    "sellEntry": "dict",
+    "SecurityId": "string",
+    "PreClosePx": "int64_t",
+    "OpenPx": "int64_t",
+    "ClosePx": "int64_t",
+    "LastPx": "int64_t",
+    "HighPx": "int64_t",
+    "LowPx": "int64_t",
+    "UpperLimit": "int64_t",
+    "LowerLimit": "int64_t",
+    "TradingPhase": "char",
+    "TradeNums": "int64_t",
+    "TradeVolumn": "int64_t",
+    "TradeValue": "int64_t",
+    "BuyLength": "uint16_t",
+    "BuyEntry": "dict",
+    "SellLength": "uint16_t",
+    "SellEntry": "dict",
 }
 
 CSecurityDntL2TradeField = {
     "ChannelNo": "uint16_t",
-    "marketId": "uint16_t",
+    "MarketId": "uint16_t",
     "ApplSeqNum": "int64_t",
     "MDStreamID": "enum",
     "BidApplSeqNum": "int64_t",
@@ -57,7 +67,7 @@ CSecurityDntL2TradeField = {
 
 CSecurityDntL2OrderField = {
     "ChannelNo": "uint16_t",
-    "marketId": "uint16_t",
+    "MarketId": "uint16_t",
     "ApplSeqNum": "int64_t",
     "MDStreamID": "enum",
     "SecurityID": "string",
@@ -70,17 +80,17 @@ CSecurityDntL2OrderField = {
 }
 
 CSecurityDntL2IndexField = {
-    "timeStamp": "int64_t",
-    "marketId": "uint16_t",
+    "TimeStamp": "int64_t",
+    "MarketId": "uint16_t",
     "SecurityID": "string",
-    "preCloseIndex": "int64_t",
-    "openIndex": "int64_t",
-    "closeIndex": "int64_t",
-    "highIndex": "int64_t",
-    "lowIndex": "int64_t",
-    "lastIndex": "int64_t",
-    "turnOver": "int64_t",
-    "totalVolume": "int64_t",
+    "PreCloseIndex": "int64_t",
+    "OpenIndex": "int64_t",
+    "CloseIndex": "int64_t",
+    "HighIndex": "int64_t",
+    "LowIndex": "int64_t",
+    "LastIndex": "int64_t",
+    "TurnOver": "int64_t",
+    "TotalVolume": "int64_t",
 }
 
 

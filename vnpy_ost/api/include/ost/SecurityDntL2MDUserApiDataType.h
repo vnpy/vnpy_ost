@@ -10,11 +10,27 @@
 //using namespace std;
 
 _DNT_NS_BEGIN_
+// 行情类别
+typedef uint16_t    TMDType;	// 行情类别
+// 上海快照
+#define MD_TYPE_SH_SNAP			10001
+// 上海委托
+#define MD_TYPE_SH_ORDER		10002
+// 上海成交
+#define MD_TYPE_SH_EXE			10003
+// 上海指数
+#define MD_TYPE_SH_INDEX		10004
 
-typedef char        TUserIdType[20];            // 用户ID
-typedef char        TReqAddress[100];           // 请求地址
-typedef char        TPasswordType[20];          // 密码
-typedef uint32_t    THeartBeatType;             // 心跳间隔
+// 深圳快照
+#define MD_TYPE_SZ_SNAP			11001
+// 深圳逐笔
+#define MD_TYPE_SZ_ORDER_EXE	11002
+// 深圳指数
+#define MD_TYPE_SZ_INDEX		11003
+
+// 请求地址
+typedef char        TAddress[32];				// ip地址
+typedef int32_t     TPort;						// 端口
 
 typedef int32_t     TRetValueType;              // 返回值
 typedef char        TErrMessageType[100];       // 错误信息
@@ -29,8 +45,8 @@ typedef char        TSecurityIDSourceType[5];   // 证券代码源
 
 // 档位信息
 typedef uint16_t    TLevelType;                 // 档位
-typedef int64_t     TPriceType;                 // 价格
-typedef int64_t     TOrderQty;                  // 数量
+typedef int64_t     TPriceType;                 // 价格 * 10000
+typedef int64_t     TOrderQty;                  // 数量 * 100
 typedef int64_t     TNumOrder;                  // 总委托笔数
 
 // 快照行情信息
@@ -70,34 +86,22 @@ typedef char        TOrderType;                 // 委托订单类别 1=市价�
 
 // 行情类别: 股票，债券，基金
 enum EMDStreamId {
-	CASH_COMMODITY = 1,    // 现货
+	CASH_COMMODITY = 1,         // 现货
 	COLLATERALISED_REPO = 2,    // 质押式回购
-	BOND_DISTRIBUTION = 3,    // 债券分销
-	OPTION = 4     // 期权
+	BOND_DISTRIBUTION = 3,      // 债券分销
+	OPTION = 4                  // 期权
 };
 
 // 行情类别
 enum EMDStreamType {
-	INCREMENT = 1,              // 增量
+	INCREMENT = 1,          // 增量
 	TOTAL = 2               // 全量
 };
 
 // 订阅类型
 enum ESubscribeType {
 	SUBSCRIBE = 1,            // 订阅
-	UNSUBSCRIBE = 2             // 取消订阅
-};
-
-// 错误码
-enum ESecurityDntMDApiError {
-	ACTION_SUCCESS = 0,		// 操作成功
-	Security_SPI_IS_EMPTY,						// SPI为空
-	REQ_ADDRESS_IS_EMPTY,						// 请求地址为空
-	INVALID_REQ_ADDRESS,						// 请求地址不合法
-	USER_IS_NOT_LOG_IN,							// 用户未登录
-	SECURITY_HAS_SUBSCRIBE,						// 股票已订阅
-	SECURITY_HAS_NOT_SUBSCRIBE,					// 股票未订阅
-	UNKNOW_ERROR								// 未知错误
+	UNSUBSCRIBE = 2           // 取消订阅
 };
 
 _DNT_NS_END_

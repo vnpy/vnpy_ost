@@ -1,9 +1,6 @@
-from logging import error
-from re import T
 import pytz
 from datetime import datetime
-from time import sleep
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Any
 from pathlib import Path
 
 from vnpy.event import EventEngine
@@ -84,10 +81,15 @@ class OstGateway(BaseGateway):
     vn.py用于对接东方证券OST的交易接口。
     """
 
-    default_setting: Dict[str, str] = {
+    default_setting: Dict[str, Any] = {
         "用户名": "",
         "密码": "",
-        "交易服务器": ""
+        "交易服务器": "",
+        "上交所快照地址": "",
+        "上交所快照端口": 0,
+        "深交所快照地址": "",
+        "深交所快照端口": 0,
+        "本机ip地址": ""
     }
 
     exchanges: List[str] = list(EXCHANGE_OST2VT.values())
@@ -104,6 +106,11 @@ class OstGateway(BaseGateway):
         userid: str = setting["用户名"]
         password: str = setting["密码"]
         td_address: str = setting["交易服务器"]
+        sh_address: str = setting["上交所快照地址"]
+        sh_port: int = setting["上交所快照端口"]
+        sz_address: str = setting["深交所快照地址"]
+        sz_port: int = setting["深交所快照端口"]
+        local_address: str = setting["本机ip地址"]
 
         if (
             (not td_address.startswith("tcp://"))
@@ -112,7 +119,7 @@ class OstGateway(BaseGateway):
             td_address = "tcp://" + td_address
 
         self.td_api.connect(td_address, userid, password)
-        self.md_api.connect()
+        self.md_api.connect(sh_address, sh_port, sz_address, sz_port, local_address)
 
         self.init_query()
 
@@ -146,7 +153,7 @@ class OstGateway(BaseGateway):
         """输出错误信息日志"""
         error_id: int = error["ErrorID"]
         error_msg: str = error["ErrorMsg"]
-        msg = f"{msg}，代码：{error_id}，信息：{error_msg}"
+        msg: str = f"{msg}，代码：{error_id}，信息：{error_msg}"
         self.write_log(msg)
 
     def process_timer_event(self, event) -> None:
@@ -194,15 +201,15 @@ class OstMdApi(MdApi):
     def onRtnL2MarketData(self, data: dict) -> None:
         """行情数据推送"""
         # 过滤没有时间戳的异常行情数据
-        if not data["origTime"]:
+        if not data["OrigTime"]:
             return
 
-        symbol: str = data["securityId"]
+        symbol: str = data["SecurityId"]
         contract: ContractData = symbol_contract_map.get(symbol, None)
         if not contract:
             return
 
-        timestamp: str = f"{self.current_date}{data['origTime']}"
+        timestamp: str = f"{self.current_date}{data['OrigTime']}"
         dt: datetime = datetime.strptime(timestamp, "%Y%m%d%H%M%S")
         dt: datetime = CHINA_TZ.localize(dt)
 
@@ -211,15 +218,15 @@ class OstMdApi(MdApi):
             exchange=contract.exchange,
             datetime=dt,
             name=contract.name,
-            volume=data["tradeVolumn"],
-            turnover=data["tradeValue"],
-            last_price=data["lastPx"],
-            limit_up=data["upperLimit"],
-            limit_down=data["lowerLimit"],
-            open_price=data["openPx"],
-            high_price=data["highPx"],
-            low_price=data["lowPx"],
-            pre_close=data["preClosePx"],
+            volume=data["TradeVolumn"],
+            turnover=data["TradeValue"],
+            last_price=data["LastPx"],
+            limit_up=data["UpperLimit"],
+            limit_down=data["LowerLimit"],
+            open_price=data["OpenPx"],
+            high_price=data["HighPx"],
+            low_price=data["LowPx"],
+            pre_close=data["PreClosePx"],
             gateway_name=self.gateway_name
         )
 
@@ -229,11 +236,34 @@ class OstMdApi(MdApi):
         tick.ask_volume_1, tick.ask_volume_2, tick.ask_volume_3, tick.ask_volume_4, tick.ask_volume_5 = data["ask_qty"][0:5]
         self.gateway.on_tick(tick)
 
-    def connect(self) -> None:
+    def connect(
+        self,
+        sh_address: str,
+        sh_port: int,
+        sz_address: str,
+        sz_port: int,
+        local_address: str
+    ) -> None:
         """连接服务器"""
         # 禁止重复发起连接，会导致异常崩溃
         if not self.connect_status:
             self.createCSecurityDntL2MDUserApi()
+
+            sh_req: dict = {
+                "MDType": 10001,
+                "RemoteAddr": sh_address,
+                "RemotePort": sh_port,
+                "LocalAddr": local_address,
+                "LocalPort": sh_port
+            }
+            sz_req: dict = {
+                "MDType": 11001,
+                "RemoteAddr": sz_address,
+                "RemotePort": sz_port,
+                "LocalAddr": local_address,
+                "LocalPort": sz_port
+            }
+            self.registerFront(sh_req, sz_req, 2)
 
             self.gateway.write_log("行情接口已连接")
             self.connect_status = True
@@ -247,11 +277,10 @@ class OstMdApi(MdApi):
                 return
 
             ost_req: dict = {
-               "securitySource": exchange,
-               "securityId": req.symbol,
-               "subscribeType": 1
+               "SecuritySource": exchange,
+               "SecurityId": req.symbol
             }
-            self.subscribeL2MarketData(ost_req, False)
+            self.subscribeL2MarketData(ost_req)
 
     def close(self) -> None:
         """关闭连接"""

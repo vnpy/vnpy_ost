@@ -1,33 +1,3 @@
-void MdApi::OnFrontConnected(const CSecurityDntRspInfoField& reply) 
-{
-	Task task = Task();
-	task.task_name = ONFRONTCONNECTED;
-	CSecurityDntRspInfoField *task_data = new CSecurityDntRspInfoField();
-	*task_data = reply;
-	task.task_data = task_data;
-	this->task_queue.push(task);
-};
-
-void MdApi::OnRspSubFutureMarketData(const CSecurityDntRspInfoField& reply) 
-{
-	Task task = Task();
-	task.task_name = ONRSPSUBFUTUREMARKETDATA;
-	CSecurityDntRspInfoField *task_data = new CSecurityDntRspInfoField();
-	*task_data = reply;
-	task.task_data = task_data;
-	this->task_queue.push(task);
-};
-
-void MdApi::OnRspUnSubFutureMarketData(const CSecurityDntRspInfoField& reply) 
-{
-	Task task = Task();
-	task.task_name = ONRSPUNSUBFUTUREMARKETDATA;
-	CSecurityDntRspInfoField *task_data = new CSecurityDntRspInfoField();
-	*task_data = reply;
-	task.task_data = task_data;
-	this->task_queue.push(task);
-};
-
 void MdApi::OnRspSubL2MarketData(const CSecurityDntRspInfoField& reply) 
 {
 	Task task = Task();
@@ -42,26 +12,6 @@ void MdApi::OnRspUnSubL2MarketData(const CSecurityDntRspInfoField& reply)
 {
 	Task task = Task();
 	task.task_name = ONRSPUNSUBL2MARKETDATA;
-	CSecurityDntRspInfoField *task_data = new CSecurityDntRspInfoField();
-	*task_data = reply;
-	task.task_data = task_data;
-	this->task_queue.push(task);
-};
-
-void MdApi::OnRspSubL1MarketData(const CSecurityDntRspInfoField& reply) 
-{
-	Task task = Task();
-	task.task_name = ONRSPSUBL1MARKETDATA;
-	CSecurityDntRspInfoField *task_data = new CSecurityDntRspInfoField();
-	*task_data = reply;
-	task.task_data = task_data;
-	this->task_queue.push(task);
-};
-
-void MdApi::OnRspUnSubL1MarketData(const CSecurityDntRspInfoField& reply) 
-{
-	Task task = Task();
-	task.task_name = ONRSPUNSUBL1MARKETDATA;
 	CSecurityDntRspInfoField *task_data = new CSecurityDntRspInfoField();
 	*task_data = reply;
 	task.task_data = task_data;
@@ -103,26 +53,6 @@ void MdApi::OnRspUnSubL2IndexMarketData(const CSecurityDntRspInfoField& reply)
 	Task task = Task();
 	task.task_name = ONRSPUNSUBL2INDEXMARKETDATA;
 	CSecurityDntRspInfoField *task_data = new CSecurityDntRspInfoField();
-	*task_data = reply;
-	task.task_data = task_data;
-	this->task_queue.push(task);
-};
-
-void MdApi::OnRtnL1MarketData(const CSecurityDntMarketDataField& reply) 
-{
-	Task task = Task();
-	task.task_name = ONRTNL1MARKETDATA;
-	CSecurityDntMarketDataField *task_data = new CSecurityDntMarketDataField();
-	*task_data = reply;
-	task.task_data = task_data;
-	this->task_queue.push(task);
-};
-
-void MdApi::OnRtnFutureMarketData(const CSecurityDntMarketDataField& reply) 
-{
-	Task task = Task();
-	task.task_name = ONRTNFUTUREMARKETDATA;
-	CSecurityDntMarketDataField *task_data = new CSecurityDntMarketDataField();
 	*task_data = reply;
 	task.task_data = task_data;
 	this->task_queue.push(task);
