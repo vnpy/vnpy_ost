@@ -92,4 +92,3 @@ CSecurityDntL2IndexField = {
     "TurnOver": "int64_t",
     "TotalVolume": "int64_t",
 }
-

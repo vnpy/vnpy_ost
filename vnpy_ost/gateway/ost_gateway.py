@@ -277,8 +277,8 @@ class OstMdApi(MdApi):
                 return
 
             ost_req: dict = {
-               "SecuritySource": exchange,
-               "SecurityId": req.symbol
+                "SecuritySource": exchange,
+                "SecurityId": req.symbol
             }
             self.subscribeL2MarketData(ost_req)
 
@@ -388,7 +388,7 @@ class OstTdApi(TdApi):
                 direction=Direction.NET,
                 volume=data["Position"],
                 frozen=data["LongFrozen"],
-                price=data["PositionCost"]/data["Position"],
+                price=data["PositionCost"] / data["Position"],
                 pnl=data["PositionProfit"],
                 yd_volume=data["YdPosition"],
                 gateway_name=self.gateway_name
@@ -469,7 +469,7 @@ class OstTdApi(TdApi):
             direction=DIRECTION_OST2VT[data["Direction"]],
             price=data["LimitPrice"],
             volume=data["VolumeTotalOriginal"],
-            traded=data["VolumeTotalOriginal"]-data["VolumeTotal"],
+            traded=data["VolumeTotalOriginal"] - data["VolumeTotal"],
             status=STATUS_OST2VT[data["OrderStatus"]],
             datetime=dt,
             gateway_name=self.gateway_name
@@ -570,7 +570,7 @@ class OstTdApi(TdApi):
             "TimeCondition": time_condition,
             "VolumeCondition": volume_condition
         }
- 
+
         if req.direction == Direction.LONG:
             ost_req["OffsetFlag"] = '0'
         else:
