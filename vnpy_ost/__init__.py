@@ -20,13 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-try:
-    from .gateway import OstGateway
-except ImportError:
-    pass
-
-
 import importlib_metadata
 
+from .gateway import OstGateway
 
-__version__ = importlib_metadata.version("vnpy_ost")
+
+try:
+    __version__ = importlib_metadata.version("vnpy_ost")
+except importlib_metadata.PackageNotFoundError:
+    __version__ = "dev"
