@@ -1,4 +1,4 @@
-//ç³»ç»Ÿ
+//ÏµÍ³
 #ifdef WIN32
 #include "stdafx.h"
 #endif
@@ -10,7 +10,7 @@
 
 using namespace pybind11;
 
-//å¸¸é‡
+//³£Á¿
 #define ONRSPSUBL2MARKETDATA 0
 #define ONRSPUNSUBL2MARKETDATA 1
 #define ONRSPSUBL2ORDERANDTRADE 2
@@ -24,18 +24,18 @@ using namespace pybind11;
 
 
 ///-------------------------------------------------------------------------------------
-///C++ SPIçš„å›è°ƒå‡½æ•°æ–¹æ³•å®ç°
+///C++ SPIµÄ»Øµ÷º¯Êı·½·¨ÊµÏÖ
 ///-------------------------------------------------------------------------------------
 
-//APIçš„ç»§æ‰¿å®ç°
+//APIµÄ¼Ì³ĞÊµÏÖ
 using namespace _DNT_;
 class MdApi : public CSecurityDntL2MDUserSpi
 {
 private:
-	CSecurityDntL2MDUserApi* api;				//APIå¯¹è±¡
-	thread task_thread;					//å·¥ä½œçº¿ç¨‹æŒ‡é’ˆï¼ˆå‘pythonä¸­æ¨é€æ•°æ®ï¼‰
-	TaskQueue task_queue;			    //ä»»åŠ¡é˜Ÿåˆ—
-	bool active = false;				//å·¥ä½œçŠ¶æ€
+	CSecurityDntL2MDUserApi* api;				//API¶ÔÏó
+	thread task_thread;					//¹¤×÷Ïß³ÌÖ¸Õë£¨ÏòpythonÖĞÍÆËÍÊı¾İ£©
+	TaskQueue task_queue;			    //ÈÎÎñ¶ÓÁĞ
+	bool active = false;				//¹¤×÷×´Ì¬
 
 public:
 	MdApi()
@@ -51,41 +51,41 @@ public:
 	};
 
 	//-------------------------------------------------------------------------------------
-	//APIå›è°ƒå‡½æ•°
+	//API»Øµ÷º¯Êı
 	//-------------------------------------------------------------------------------------
 
-	/// è®¢é˜…L2è¡Œæƒ…åº”ç­”
+	/// ¶©ÔÄL2ĞĞÇéÓ¦´ğ
 	virtual void OnRspSubL2MarketData(const CSecurityDntRspInfoField& reply);
 
-	/// å–æ¶ˆè®¢é˜…Level2è¡Œæƒ…åº”ç­”
+	/// È¡Ïû¶©ÔÄLevel2ĞĞÇéÓ¦´ğ
 	virtual void OnRspUnSubL2MarketData(const CSecurityDntRspInfoField& reply);
 
-	/// é€ç¬”è®¢é˜…åº”ç­”
+	/// Öğ±Ê¶©ÔÄÓ¦´ğ
 	virtual void OnRspSubL2OrderAndTrade(const CSecurityDntRspInfoField& reply);
 
-	/// å–æ¶ˆé€ç¬”è®¢é˜…åº”ç­”
+	/// È¡ÏûÖğ±Ê¶©ÔÄÓ¦´ğ
 	virtual void OnRspUnSubL2OrderAndTrade(const CSecurityDntRspInfoField& reply);
 
-	/// æŒ‡æ•°è®¢é˜…åº”ç­”
+	/// Ö¸Êı¶©ÔÄÓ¦´ğ
 	virtual void OnRspSubL2IndexMarketData(const CSecurityDntRspInfoField& reply);
 
-	/// å–æ¶ˆæŒ‡æ•°è®¢é˜…åº”ç­”
+	/// È¡ÏûÖ¸Êı¶©ÔÄÓ¦´ğ
 	virtual void OnRspUnSubL2IndexMarketData(const CSecurityDntRspInfoField& reply);
 
-	/// Level2è¡Œæƒ…é€šçŸ¥
+	/// Level2ĞĞÇéÍ¨Öª
 	virtual void OnRtnL2MarketData(const CSecurityDntMarketDataField& reply);
 
-	/// Level2æŒ‡æ•°é€šçŸ¥
+	/// Level2Ö¸ÊıÍ¨Öª
 	virtual void OnRtnL2IndexMarketData(const CSecurityDntL2IndexField& reply);
 
-	/// Level2é€ç¬”å§”æ‰˜è¡Œæƒ…é€šçŸ¥
+	/// Level2Öğ±ÊÎ¯ÍĞĞĞÇéÍ¨Öª
 	virtual void OnRtnL2Order(const CSecurityDntL2OrderField& pL2Order);
 
-	/// Level2é€ç¬”æˆäº¤è¡Œæƒ…é€šçŸ¥
+	/// Level2Öğ±Ê³É½»ĞĞÇéÍ¨Öª
 	virtual void OnRtnL2Trade(const CSecurityDntL2TradeField& pL2Trade);
 
     //-------------------------------------------------------------------------------------
-    //taskï¼šä»»åŠ¡
+    //task£ºÈÎÎñ
     //-------------------------------------------------------------------------------------
 
 	void processTask();
@@ -111,11 +111,11 @@ public:
     void processRtnL2Trade(Task *task);
 
 	//-------------------------------------------------------------------------------------
-    //dataï¼šå›è°ƒå‡½æ•°çš„æ•°æ®å­—å…¸
-    //errorï¼šå›è°ƒå‡½æ•°çš„é”™è¯¯å­—å…¸
-    //idï¼šè¯·æ±‚id
-    //lastï¼šæ˜¯å¦ä¸ºæœ€åè¿”å›
-    //iï¼šæ•´æ•°
+    //data£º»Øµ÷º¯ÊıµÄÊı¾İ×Öµä
+    //error£º»Øµ÷º¯ÊıµÄ´íÎó×Öµä
+    //id£ºÇëÇóid
+    //last£ºÊÇ·ñÎª×îºó·µ»Ø
+    //i£ºÕûÊı
     //-------------------------------------------------------------------------------------
 
     virtual void onRspSubL2MarketData(const dict &data) {};
@@ -139,7 +139,7 @@ public:
     virtual void onRtnL2Trade(const dict &data) {};
 
 	//-------------------------------------------------------------------------------------
-    //req:ä¸»åŠ¨å‡½æ•°çš„è¯·æ±‚å­—å…¸
+    //req:Ö÷¶¯º¯ÊıµÄÇëÇó×Öµä
     //-------------------------------------------------------------------------------------
 
 	void createCSecurityDntL2MDUserApi();
