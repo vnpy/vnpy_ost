@@ -6,14 +6,26 @@ from setuptools import Extension, setup
 def get_ext_modules() -> list:
     """
     获取三方模块
-    Windos需要编译使用
-    Linux暂未支持
+    Linux和Windows需要编译封装接口
     Mac由于缺乏二进制库支持无法使用
     """
+    if platform.system() == "Linux":
+        extra_compile_flags = [
+            "-std=c++17",
+            "-O3",
+            "-Wno-delete-incomplete",
+            "-Wno-sign-compare",
+        ]
+        extra_link_args = ["-lstdc++"]
+        runtime_library_dirs = ["$ORIGIN"]
 
-    extra_compile_flags = ["-O2", "-MT"]
-    extra_link_args = []
-    runtime_library_dirs = []
+    elif platform.system() == "Windows":
+        extra_compile_flags = ["-O2", "-MT"]
+        extra_link_args = []
+        runtime_library_dirs = []
+
+    else:
+        return []
 
     vnostmd = Extension(
         name="vnpy_ost.api.vnostmd",
