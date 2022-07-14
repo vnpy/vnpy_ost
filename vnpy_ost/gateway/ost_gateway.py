@@ -1,7 +1,7 @@
-import pytz
 from datetime import datetime
 from typing import Dict, List, Tuple, Any
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from vnpy.event import EventEngine
 from vnpy.trader.constant import (
@@ -23,7 +23,7 @@ from vnpy.trader.object import (
     CancelRequest,
     SubscribeRequest,
 )
-from vnpy.trader.utility import get_folder_path
+from vnpy.trader.utility import get_folder_path, ZoneInfo
 from vnpy.trader.event import EVENT_TIMER
 
 from ..api import MdApi, TdApi
@@ -70,7 +70,7 @@ PRODUCT_OST2VT: Dict[str, Product] = {
 }
 
 # 中国时区
-CHINA_TZ = pytz.timezone("Asia/Shanghai")
+CHINA_TZ = ZoneInfo("Asia/Shanghai")
 
 # 合约数据全局缓存字典
 symbol_contract_map: Dict[str, ContractData] = {}
@@ -213,7 +213,7 @@ class OstMdApi(MdApi):
 
         timestamp: str = f"{self.current_date}{data['OrigTime']}"
         dt: datetime = datetime.strptime(timestamp, "%Y%m%d%H%M%S")
-        dt: datetime = CHINA_TZ.localize(dt)
+        dt: datetime = dt.replace(tzinfo=CHINA_TZ)
 
         tick: TickData = TickData(
             symbol=symbol,
@@ -458,7 +458,7 @@ class OstTdApi(TdApi):
 
         timestamp: str = f"{data['TradingDay']} {data['InsertTime']}"
         dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
-        dt: datetime = CHINA_TZ.localize(dt)
+        dt: datetime = dt.replace(tzinfo=CHINA_TZ)
 
         tp: tuple = (data["OrderPriceType"], data["TimeCondition"], data["VolumeCondition"])
 
@@ -495,7 +495,7 @@ class OstTdApi(TdApi):
 
         timestamp: str = f"{data['TradeDate']} {data['TradeTime']}"
         dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
-        dt: datetime = CHINA_TZ.localize(dt)
+        dt: datetime = dt.replace(tzinfo=CHINA_TZ)
 
         trade: TradeData = TradeData(
             symbol=symbol,
