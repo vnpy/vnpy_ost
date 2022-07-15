@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Dict, List, Tuple, Any
 from pathlib import Path
-from zoneinfo import ZoneInfo
 
 from vnpy.event import EventEngine
 from vnpy.trader.constant import (
