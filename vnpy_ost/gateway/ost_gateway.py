@@ -1,4 +1,3 @@
-import pytz
 from datetime import datetime
 from typing import Dict, List, Tuple, Any
 from pathlib import Path
@@ -12,7 +11,6 @@ from vnpy.trader.constant import (
     Status
 )
 from vnpy.trader.gateway import BaseGateway
-
 from vnpy.trader.object import (
     TickData,
     OrderData,
@@ -24,8 +22,9 @@ from vnpy.trader.object import (
     CancelRequest,
     SubscribeRequest,
 )
-from vnpy.trader.utility import get_folder_path
+from vnpy.trader.utility import get_folder_path, ZoneInfo
 from vnpy.trader.event import EVENT_TIMER
+
 from ..api import MdApi, TdApi
 
 # 委托状态映射
@@ -70,7 +69,7 @@ PRODUCT_OST2VT: Dict[str, Product] = {
 }
 
 # 中国时区
-CHINA_TZ = pytz.timezone("Asia/Shanghai")
+CHINA_TZ = ZoneInfo("Asia/Shanghai")
 
 # 合约数据全局缓存字典
 symbol_contract_map: Dict[str, ContractData] = {}
@@ -78,7 +77,7 @@ symbol_contract_map: Dict[str, ContractData] = {}
 
 class OstGateway(BaseGateway):
     """
-    vn.py用于对接东方证券OST的交易接口。
+    VeighNa用于对接东方证券OST的交易接口。
     """
 
     default_name: str = "OST"
@@ -213,7 +212,7 @@ class OstMdApi(MdApi):
 
         timestamp: str = f"{self.current_date}{data['OrigTime']}"
         dt: datetime = datetime.strptime(timestamp, "%Y%m%d%H%M%S")
-        dt: datetime = CHINA_TZ.localize(dt)
+        dt: datetime = dt.replace(tzinfo=CHINA_TZ)
 
         tick: TickData = TickData(
             symbol=symbol,
@@ -428,7 +427,6 @@ class OstTdApi(TdApi):
             )
 
             self.gateway.on_contract(contract)
-
             symbol_contract_map[contract.symbol] = contract
 
         if last:
@@ -459,9 +457,9 @@ class OstTdApi(TdApi):
 
         timestamp: str = f"{data['TradingDay']} {data['InsertTime']}"
         dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
-        dt: datetime = CHINA_TZ.localize(dt)
+        dt: datetime = dt.replace(tzinfo=CHINA_TZ)
 
-        tp = (data["OrderPriceType"], data["TimeCondition"], data["VolumeCondition"])
+        tp: tuple = (data["OrderPriceType"], data["TimeCondition"], data["VolumeCondition"])
 
         order: OrderData = OrderData(
             symbol=symbol,
@@ -496,7 +494,7 @@ class OstTdApi(TdApi):
 
         timestamp: str = f"{data['TradeDate']} {data['TradeTime']}"
         dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
-        dt: datetime = CHINA_TZ.localize(dt)
+        dt: datetime = dt.replace(tzinfo=CHINA_TZ)
 
         trade: TradeData = TradeData(
             symbol=symbol,
@@ -551,12 +549,12 @@ class OstTdApi(TdApi):
             return ""
 
         if not req.direction:
-            self.gateway.write_log(f"请选择买卖方向")
+            self.gateway.write_log("请选择买卖方向")
             return ""
 
         self.order_ref += 1
 
-        tp = ORDERTYPE_VT2OST[req.type]
+        tp: tuple = ORDERTYPE_VT2OST[req.type]
         price_type, time_condition, volume_condition = tp
 
         ost_req: dict = {
