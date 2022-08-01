@@ -167,24 +167,24 @@ class ApiGenerator:
                     elif type_ == "const":
                         type__ = field.rsplit("&")[0]
                         f.write(f"\t{type__} *task_data = new {type__}();\n")
-                        f.write(f"\t*task_data = reply;\n")
-                        f.write(f"\ttask.task_data = task_data;\n")
+                        f.write("\t*task_data = reply;\n")
+                        f.write("\ttask.task_data = task_data;\n")
                     elif type_ == "CUTRspInfoField":
                         f.write(f"\tif ({field})\n")
                         f.write("\t{\n")
                         f.write(f"\t\t{type_} *task_error = new {type_}();\n")
                         f.write(f"\t\t*task_error = *{field};\n")
-                        f.write(f"\t\ttask.task_error = task_error;\n")
+                        f.write("\t\ttask.task_error = task_error;\n")
                         f.write("\t}\n")
                     else:
                         f.write(f"\tif ({field})\n")
                         f.write("\t{\n")
                         f.write(f"\t\t{type_} *task_data = new {type_}();\n")
                         f.write(f"\t\t*task_data = *{field};\n")
-                        f.write(f"\t\ttask.task_data = task_data;\n")
+                        f.write("\t\ttask.task_data = task_data;\n")
                         f.write("\t}\n")
 
-                f.write(f"\tthis->task_queue.push(task);\n")
+                f.write("\tthis->task_queue.push(task);\n")
                 f.write("};\n\n")
 
     def generate_source_switch(self):
@@ -196,7 +196,7 @@ class ApiGenerator:
                 f.write(f"case {name.upper()}:\n")
                 f.write("{\n")
                 f.write(f"\tthis->{process_name}(&task);\n")
-                f.write(f"\tbreak;\n")
+                f.write("\tbreak;\n")
                 f.write("}\n\n")
 
     def generate_source_process(self):
@@ -347,7 +347,7 @@ class ApiGenerator:
                 f.write("\t}\n")
                 f.write("\tcatch (const error_already_set &e)\n")
                 f.write("\t{\n")
-                f.write(f"\t\tcout << e.what() << endl;\n")
+                f.write("\t\tcout << e.what() << endl;\n")
                 f.write("\t}\n")
                 f.write("};\n\n")
 

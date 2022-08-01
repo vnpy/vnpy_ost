@@ -46,7 +46,7 @@ class StructGenerator:
             self.process_declare(line)
         elif line.startswith("};"):
             self.process_end(line)
-        elif line.startswith("{") or "public:" in line or "()" in line or "memset" in line or "}"in line or line.startswith("//") or "// U" in line or "//买卖盘" in line or "//委托笔数揭示" in line:
+        elif line.startswith("{") or "public:" in line or "()" in line or "memset" in line or "}" in line or line.startswith("//") or "// U" in line or "//买卖盘" in line or "//委托笔数揭示" in line:
             self.process_start(line)
         elif "\t" in line and "///" not in line:
             self.process_member(line)

@@ -53,5 +53,5 @@ def get_ext_modules() -> list:
 
     return [vnosttd, vnostmd]
 
-    
+
 setup(ext_modules=get_ext_modules())
